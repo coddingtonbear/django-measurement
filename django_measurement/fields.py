@@ -30,7 +30,7 @@ class Measurement(object):
             measurement_type_field='measurement_type', 
             original_unit_field=None
         ):
-        super(MeasurementField, self).__init__()
+        super(Measurement, self).__init__()
         self.measurement_field = measurement_field
         self.measurement_type_field = measurement_type_field
         self.original_unit_field = original_unit_field
