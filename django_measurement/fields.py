@@ -40,8 +40,12 @@ class MeasurementFieldDescriptor(object):
             return self
 
         instance_measure = self._get_measurement_type(instance)
+        measurement_value = getattr(
+            instance,
+            self.field.attname
+        )
         measurement = instance_measure(
-            **{instance_measure.STANDARD_UNIT: self.value}
+            **{instance_measure.STANDARD_UNIT: measurement_value}
         )
         if self.field.original_unit_field:
             original_unit = getattr(
@@ -66,7 +70,7 @@ class MeasurementFieldDescriptor(object):
         if self.field.original_unit_field:
             setattr(instance, self.field.original_unit_field, measurement._default_unit)
 
-        self.value = getattr(measurement, measurement.STANDARD_UNIT, 0)
+        setattr(instance, self.field.attname, getattr(measurement, measurement.STANDARD_UNIT, 0))
 
 class MeasurementField(FloatField):
     def __init__(self, 
@@ -82,6 +86,12 @@ class MeasurementField(FloatField):
         if not self.measure_field and not self.measure:
             raise AttributeError('You must specify either measure_field or measure')
         self.original_unit_field = original_unit_field
+
+    def get_attname(self):
+        return '%s_value' % self.name
+
+    def get_attname_column(self):
+        return self.get_attname(), self.name
 
     def contribute_to_class(self, cls, name):
         super(MeasurementField, self).contribute_to_class(cls, name)
