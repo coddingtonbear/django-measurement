@@ -1,27 +1,31 @@
 from django.db.models import signals
-from django.db.models.fields import CharField, DecimalField, CharField
+from django.db.models.fields import CharField, FloatField, CharField
 
 from django_measurement import measure
 
 
 class MeasurementTypeField(CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['choices'] = kwargs.get('choices', zip(measure.__all__, measure.__all__))
         kwargs['max_length'] = kwargs.get('max_length', 10)
+        kwargs['choices'] = kwargs.get('choices', zip(measure.__all__, measure.__all__))
         super(MeasurementTypeField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
-        return 'MeasurementTypeField'
+        return 'CharField'
 
 
-class MeasurementField(DecimalField):
+class MeasurementField(FloatField):
     def get_internal_type(self):
-        return 'MeasurementField'
+        return 'FloatField'
 
 
 class OriginalUnitField(CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = kwargs.get('max_length', 20)
+        super(OriginalUnitField, self).__init__(*args, **kwargs)
+
     def get_internal_type(self):
-        return 'OriginalUnitField'
+        return 'CharField'
 
 
 class Measurement(object):
@@ -66,7 +70,7 @@ class Measurement(object):
             self.measurement_field,
             0
         )
-        measure = measurement_type(
+        measurement = measurement_type(
             **{measurement_type.STANDARD_UNIT: value}
         )
         if self.original_unit_field:
@@ -74,21 +78,21 @@ class Measurement(object):
                 instance,
                 self.original_unit_field
             )
-            measure._default_unit = original_unit
+            measurement._default_unit = original_unit
 
-        return measure
+        return measurement
 
-    def __set__(self, instance, measure):
+    def __set__(self, instance, measurement):
         if instance is None:
             raise AttributeError("Must be accessed via instance")
 
-        measurement_type = measure.__class__.__name__
-        value = getattr(measure, measure.STANDARD_UNIT, 0)
+        measurement_type = measurement.__class__.__name__
+        value = getattr(measurement, measurement.STANDARD_UNIT, 0)
 
         setattr(instance, self.measurement_type_field, measurement_type)
         setattr(instance, self.measurement_field, value)
         if self.original_unit_field:
-            setattr(instance, self.original_unit_field, measure._default_unit)
+            setattr(instance, self.original_unit_field, measurement._default_unit)
 
 try:
     from south.modelsinspector import add_introspection_rules
