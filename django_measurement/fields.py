@@ -1,22 +1,17 @@
-from django.db.models import signals
+from django.db.models import signals, SubfieldBase
 from django.db.models.fields import CharField, FloatField, CharField
 
 from django_measurement import measure
 
 
-class MeasurementTypeField(CharField):
+class MeasureField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 10)
         kwargs['choices'] = kwargs.get('choices', zip(measure.__all__, measure.__all__))
-        super(MeasurementTypeField, self).__init__(*args, **kwargs)
+        super(MeasureField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
         return 'CharField'
-
-
-class MeasurementField(FloatField):
-    def get_internal_type(self):
-        return 'FloatField'
 
 
 class OriginalUnitField(CharField):
@@ -28,55 +23,30 @@ class OriginalUnitField(CharField):
         return 'CharField'
 
 
-class Measurement(object):
-    def __init__(self, 
-            measurement_field='measurement', 
-            measurement_type_field='measurement_type', 
-            original_unit_field=None
-        ):
-        super(Measurement, self).__init__()
-        self.measurement_field = measurement_field
-        self.measurement_type_field = measurement_type_field
-        self.original_unit_field = original_unit_field
+class MeasurementFieldDescriptor(object):
+    def __init__(self, field):
+        self.field = field
 
-    def contribute_to_class(self, cls, name):
-        self.name = name
-        self.model = cls
-        cls._meta.add_virtual_field(self)
-
-        signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
-
-        setattr(cls, name, self)
-
-    def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
-        if self.name in kwargs:
-            value = kwargs.pop(self.name)
-            kwargs[self.measurement_field] = getattr(value, value.STANDARD_UNIT)
-            kwargs[self.measurement_type_field] = value.__class__.__name__
-            if self.original_unit_field:
-                kwargs[self.original_unit_field] = value._default_unit
+    def _get_measurement_type(self, instance):
+        if self.field.measure_field:
+            return getattr(
+                measure,
+                getattr(instance, self.field.measure_field)
+            )
+        return self.field.measure
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
 
-        type_field = self.model._meta.get_field(self.measurement_type_field)
-        measurement_type = getattr(
-            measure,
-            getattr(instance, self.measurement_type_field)
+        instance_measure = self._get_measurement_type(instance)
+        measurement = instance_measure(
+            **{instance_measure.STANDARD_UNIT: self.value}
         )
-        value = getattr(
-            instance,
-            self.measurement_field,
-            0
-        )
-        measurement = measurement_type(
-            **{measurement_type.STANDARD_UNIT: value}
-        )
-        if self.original_unit_field:
+        if self.field.original_unit_field:
             original_unit = getattr(
                 instance,
-                self.original_unit_field
+                self.field.original_unit_field
             )
             measurement._default_unit = original_unit
 
@@ -85,17 +55,43 @@ class Measurement(object):
     def __set__(self, instance, measurement):
         if instance is None:
             raise AttributeError("Must be accessed via instance")
+        
+        if self.field.measure:
+            if not isinstance(self.field.measure, measurement):
+                raise ValueError("Accepts only instances of type %s" % self.field.measure)
+        else:
+            measurement_measure = measurement.__class__.__name__
+            setattr(instance, self.field.measure_field, measurement_measure)
 
-        measurement_type = measurement.__class__.__name__
-        value = getattr(measurement, measurement.STANDARD_UNIT, 0)
+        if self.field.original_unit_field:
+            setattr(instance, self.field.original_unit_field, measurement._default_unit)
 
-        setattr(instance, self.measurement_type_field, measurement_type)
-        setattr(instance, self.measurement_field, value)
-        if self.original_unit_field:
-            setattr(instance, self.original_unit_field, measurement._default_unit)
+        self.value = getattr(measurement, measurement.STANDARD_UNIT, 0)
+
+class MeasurementField(FloatField):
+    def __init__(self, 
+            measure=None,
+            measure_field=None, 
+            original_unit_field=None,
+            *args,
+            **kwargs
+        ):
+        super(MeasurementField, self).__init__(*args, **kwargs)
+        self.measure_field = measure_field
+        self.measure = measure
+        if not self.measure_field and not self.measure:
+            raise AttributeError('You must specify either measure_field or measure')
+        self.original_unit_field = original_unit_field
+
+    def contribute_to_class(self, cls, name):
+        super(MeasurementField, self).contribute_to_class(cls, name)
+        setattr(cls, self.name, MeasurementFieldDescriptor(self))
+
+    def get_prep_value(self, value):
+        return getattr(value, value.STANDARD_UNIT, 0)
 
 try:
     from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^django_measurement\.fields\.(MeasurementTypeField|MeasurementField|OriginalUnitField)"])
+    add_introspection_rules([], ["^django_measurement\.fields\.(MeasuremeField|MeasurementField|OriginalUnitField)"])
 except ImportError:
     pass
