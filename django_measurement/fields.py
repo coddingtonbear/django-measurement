@@ -1,4 +1,3 @@
-from django.db.models import signals, SubfieldBase
 from django.db.models.fields import CharField, FloatField, CharField
 
 from django_measurement import measure
@@ -24,35 +23,35 @@ class OriginalUnitField(CharField):
 
 
 class MeasurementFieldDescriptor(object):
-    def __init__(self, field):
+    def __init__(self, field, measurement_field_name, original_unit_field_name, measure_field_name):
         self.field = field
+        self.measurement_field_name = measurement_field_name
+        self.original_unit_field_name = original_unit_field_name
+        self.measure_field_name = measure_field_name
 
-    def _get_measurement_type(self, instance):
-        if self.field.measure_field:
-            return getattr(
-                measure,
-                getattr(instance, self.field.measure_field)
-            )
-        return self.field.measure
+    def _get_measure(self, instance):
+        return getattr(
+            measure,
+            getattr(instance, self.measure_field_name)
+        )
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
 
-        instance_measure = self._get_measurement_type(instance)
+        instance_measure = self._get_measure(instance)
         measurement_value = getattr(
             instance,
-            self.field.attname
+            self.measurement_field_name,
         )
         measurement = instance_measure(
             **{instance_measure.STANDARD_UNIT: measurement_value}
         )
-        if self.field.original_unit_field:
-            original_unit = getattr(
-                instance,
-                self.field.original_unit_field
-            )
-            measurement._default_unit = original_unit
+        original_unit = getattr(
+            instance,
+            self.original_unit_field_name,
+        )
+        measurement._default_unit = original_unit
 
         return measurement
 
@@ -60,45 +59,66 @@ class MeasurementFieldDescriptor(object):
         if instance is None:
             raise AttributeError("Must be accessed via instance")
         
-        if self.field.measure:
-            if not isinstance(self.field.measure, measurement):
-                raise ValueError("Accepts only instances of type %s" % self.field.measure)
-        else:
-            measurement_measure = measurement.__class__.__name__
-            setattr(instance, self.field.measure_field, measurement_measure)
-
-        if self.field.original_unit_field:
-            setattr(instance, self.field.original_unit_field, measurement._default_unit)
-
-        setattr(instance, self.field.attname, getattr(measurement, measurement.STANDARD_UNIT, 0))
+        measurement_measure = measurement.__class__.__name__
+        setattr(instance, self.measure_field_name, measurement_measure)
+        setattr(instance, self.original_unit_field_name, measurement._default_unit)
+        setattr(instance, self.measurement_field_name, getattr(measurement, measurement.STANDARD_UNIT, 0))
 
 class MeasurementField(FloatField):
     def __init__(self, 
-            measure=None,
-            measure_field=None, 
-            original_unit_field=None,
             *args,
             **kwargs
         ):
         super(MeasurementField, self).__init__(*args, **kwargs)
-        self.measure_field = measure_field
-        self.measure = measure
-        if not self.measure_field and not self.measure:
-            raise AttributeError('You must specify either measure_field or measure')
-        self.original_unit_field = original_unit_field
-
-    def get_attname(self):
-        return '%s_value' % self.name
-
-    def get_attname_column(self):
-        return self.get_attname(), self.name
 
     def contribute_to_class(self, cls, name):
-        super(MeasurementField, self).contribute_to_class(cls, name)
-        setattr(cls, self.name, MeasurementFieldDescriptor(self))
+        self.name = name
 
-    def get_prep_value(self, value):
-        return getattr(value, value.STANDARD_UNIT, 0)
+        original_unit_field_name = '%s_unit' % self.name
+        self.original_unit_field = CharField(
+            editable=False,
+            blank=True,
+            default='',
+            max_length=50,
+        )
+        cls.add_to_class(original_unit_field_name, self.original_unit_field)
+
+        measure_field_name = '%s_measure' % self.name
+        self.measure_field = CharField(
+            editable=False,
+            blank=True,
+            default='',
+            max_length=255,
+        )
+        cls.add_to_class(measure_field_name, self.measure_field)
+
+        measurement_field_name = '%s_value' % self.name
+        self.measurement_field = CharField(
+            editable=False,
+            blank=True,
+            default='',
+            max_length=50,
+        )
+        cls.add_to_class(measurement_field_name, self.measurement_field)
+
+        field = MeasurementFieldDescriptor(
+            self,
+            measurement_field_name=measurement_field_name,
+            original_unit_field_name=original_unit_field_name,
+            measure_field_name=measure_field_name,
+        )
+
+        setattr(cls, self.name, field)
+
+    def __get__(self, instance, type=None):
+        if instance is None:
+            return self
+        return self.instance_class(instance, self)
+
+    def __set__(self, instance, value):
+        if not isinstance(value, measure.MeasureBase):
+            raise TypeError('')
+
 
 try:
     from south.modelsinspector import add_introspection_rules
