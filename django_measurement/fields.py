@@ -2,26 +2,6 @@ from django.db.models.fields import CharField, FloatField, CharField
 
 from django_measurement import measure
 
-
-class MeasureField(CharField):
-    def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = kwargs.get('max_length', 10)
-        kwargs['choices'] = kwargs.get('choices', zip(measure.__all__, measure.__all__))
-        super(MeasureField, self).__init__(*args, **kwargs)
-
-    def get_internal_type(self):
-        return 'CharField'
-
-
-class OriginalUnitField(CharField):
-    def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = kwargs.get('max_length', 20)
-        super(OriginalUnitField, self).__init__(*args, **kwargs)
-
-    def get_internal_type(self):
-        return 'CharField'
-
-
 class MeasurementFieldDescriptor(object):
     def __init__(self, field, measurement_field_name, original_unit_field_name, measure_field_name):
         self.field = field

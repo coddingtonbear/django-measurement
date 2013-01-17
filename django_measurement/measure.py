@@ -1,6 +1,13 @@
 from decimal import Decimal
 
-from django.contrib.gis.measure import Distance, Area, MeasureBase
+import django
+
+if django.VERSION[0] > 1 or (django.VERSION[0] == 1 and django.VERSION[1] > 4):
+    from django.contrib.gis.measure import MeasureBase
+else:
+    from django_measurement.backports import MeasureBase
+
+from django.contrib.gis.measure import Distance, Area
 
 __all__ = [
     'Distance',
