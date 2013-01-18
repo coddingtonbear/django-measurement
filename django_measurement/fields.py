@@ -14,7 +14,7 @@ class MeasurementFieldDescriptor(object):
         self.measure_field_name = measure_field_name
 
     def _get_class_by_path(self, path):
-        mod = __import__(path)
+        mod = __import__('.'.join(path.split('.')[:-1]))
         components = path.split('.')
         for comp in components[1:]:
             mod = getattr(mod, comp)
