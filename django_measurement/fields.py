@@ -1,7 +1,10 @@
+from django.conf import settings
 from django.db.models import signals
 from django.db.models.fields import CharField, FloatField, CharField
 
 from django_measurement import measure
+
+MEASURE_OVERRIDES = getattr(settings, 'MEASURE_OVERRIDES', {})
 
 class MeasurementFieldDescriptor(object):
     def __init__(self, field, measurement_field_name, original_unit_field_name, measure_field_name):
@@ -10,26 +13,44 @@ class MeasurementFieldDescriptor(object):
         self.original_unit_field_name = original_unit_field_name
         self.measure_field_name = measure_field_name
 
+    def _get_class_by_path(self, path):
+        mod = __import__(path)
+        components = path.split('.')
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        return mod
+
+    def _get_measure(self, instance):
+        measure_name = getattr(instance, self.measure_field_name)
+        if measure_name in MEASURE_OVERRIDES:
+            return self._get_class_by_path(
+                MEASURE_OVERRIDES[measure_name]
+            )
+        return getattr(
+            measure,
+            measure_name
+        )
+
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
 
-        instance_measure = getattr(
-            measure,
-            getattr(instance, self.measure_field_name)
-        )
-        measurement_value = getattr(
-            instance,
-            self.measurement_field_name,
-        )
-        measurement = instance_measure(
-            **{instance_measure.STANDARD_UNIT: measurement_value}
-        )
-        original_unit = getattr(
-            instance,
-            self.original_unit_field_name,
-        )
-        measurement._default_unit = original_unit
+        try:
+            instance_measure = self._get_measure(instance)
+            measurement_value = getattr(
+                instance,
+                self.measurement_field_name,
+            )
+            measurement = instance_measure(
+                **{instance_measure.STANDARD_UNIT: measurement_value}
+            )
+            original_unit = getattr(
+                instance,
+                self.original_unit_field_name,
+            )
+            measurement._default_unit = original_unit
+        except (AttributeError, ValueError):
+            return None
 
         return measurement
 
