@@ -115,3 +115,21 @@ this would be realized in three columns:
 - ``volume_measure``: Stores the measurement's measure ('Weight', 'Volume', 'Distance', etc.).
 - ``volume_value``: Stores the float value of the measurement in the measure's standard unit.
 
+Settings
+========
+
+``MEASURE_OVERRIDES``
+---------------------
+
+If you have your own measures to add, 
+you can specify a name for your measure and a string class path to allow
+for your custom measure to be properly stored and resurrected.::
+
+    MEASURE_OVERRIDES = {
+        'IU': 'path.to.my.class.IUMeasure'
+    }
+
+You can also override existing measure classes this way.
+Be sure to look at ``django-measurement/measure.py`` for examples of what
+makes a measurement class.
+
