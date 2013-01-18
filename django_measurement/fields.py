@@ -10,17 +10,14 @@ class MeasurementFieldDescriptor(object):
         self.original_unit_field_name = original_unit_field_name
         self.measure_field_name = measure_field_name
 
-    def _get_measure(self, instance):
-        return getattr(
-            measure,
-            getattr(instance, self.measure_field_name)
-        )
-
     def __get__(self, instance, instance_type=None):
         if instance is None:
             return self
 
-        instance_measure = self._get_measure(instance)
+        instance_measure = getattr(
+            measure,
+            getattr(instance, self.measure_field_name)
+        )
         measurement_value = getattr(
             instance,
             self.measurement_field_name,
