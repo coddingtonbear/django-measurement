@@ -6,6 +6,12 @@ from django_measurement import measure
 
 MEASURE_OVERRIDES = getattr(settings, 'MEASURE_OVERRIDES', {})
 
+def get_measurement_parts(value):
+    measure_name = value.__class__.__name__
+    original_unit = value._default_unit
+    standard_value = getattr(value, value.STANDARD_UNIT)
+    return measure_name, original_unit, standard_value
+
 class MeasurementFieldDescriptor(object):
     def __init__(self, field, measurement_field_name, original_unit_field_name, measure_field_name):
         self.field = field
@@ -57,11 +63,14 @@ class MeasurementFieldDescriptor(object):
     def __set__(self, instance, measurement):
         if instance is None:
             raise AttributeError("Must be accessed via instance")
+
+        measure_name, original_unit, standard_value = get_measurement_parts(
+            measurement
+        )
         
-        measurement_measure = measurement.__class__.__name__
-        setattr(instance, self.measure_field_name, measurement_measure)
-        setattr(instance, self.original_unit_field_name, measurement._default_unit)
-        setattr(instance, self.measurement_field_name, getattr(measurement, measurement.STANDARD_UNIT, 0))
+        setattr(instance, self.measure_field_name, measure_name)
+        setattr(instance, self.original_unit_field_name, original_unit)
+        setattr(instance, self.measurement_field_name, standard_value)
 
 class MeasurementField(FloatField):
     def __init__(self, 
@@ -126,9 +135,12 @@ class MeasurementField(FloatField):
     def instance_pre_init(self, signal, sender, args, kwargs, **_kwargs):
         if self.name in kwargs:
             value = kwargs.pop(self.name)
-            kwargs[self.get_original_unit_field_name()] = value._default_unit
-            kwargs[self.get_measure_field_name()] = value.__class__.__name__
-            kwargs[self.get_measurement_field_name()] = getattr(value, value.STANDARD_UNIT, 0)
+            measure_name, original_unit, standard_value = get_measurement_parts(
+                value
+            )
+            kwargs[self.get_measure_field_name()] = measure_name
+            kwargs[self.get_original_unit_field_name()] = original_unit
+            kwargs[self.get_measurement_field_name()] = standard_value
 
 
 try:
