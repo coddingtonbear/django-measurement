@@ -36,9 +36,7 @@ except ImportError:
 if django.VERSION[0] > 1 or (django.VERSION[0] == 1 and django.VERSION[1] > 4):
     from django.contrib.gis.measure import MeasureBase
 else:
-    from django.utils import six
-
-    NUMERIC_TYPES = six.integer_types + (float, Decimal)
+    NUMERIC_TYPES = (int, long, float, Decimal)
     # Set STANDARD_UNIT for existing Distance/Area classes
     Distance.STANDARD_UNIT = 'm'
     Area.STANDARD_UNIT = 'sq_m'
