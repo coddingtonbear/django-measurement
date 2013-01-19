@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db.models import signals
-from django.db.models.fields import CharField, FloatField, CharField
+from django.db.models.fields import CharField, FloatField, CharField, Field
 
 from django_measurement import measure
 
@@ -81,7 +81,7 @@ class MeasurementFieldDescriptor(object):
         setattr(instance, self.original_unit_field_name, original_unit)
         setattr(instance, self.measurement_field_name, standard_value)
 
-class MeasurementField(FloatField):
+class MeasurementField(Field):
     def __init__(self, 
             *args,
             **kwargs

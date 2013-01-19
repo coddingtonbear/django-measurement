@@ -1,4 +1,4 @@
-from django_measurement.base import Distance, Area, MeasureBase
+from django_measurement.base import Distance, Area, MeasureBase, total_ordering
 
 __all__ = [
     'Distance',
@@ -36,6 +36,7 @@ class Weight(MeasureBase):
         'long ton': 'long_ton',
     }
     LALIAS = dict([(k.lower(), v) for k, v in ALIAS.items()])
+
 
 class Volume(MeasureBase):
     STANDARD_UNIT = 'cubic_meter'
@@ -88,6 +89,7 @@ class Volume(MeasureBase):
         super(Volume, self).__init__(*args, **kwargs)
 
 
+@total_ordering
 class UnknownMeasure(object):
     def __init__(self, measure, original_unit, value):
         self.measure = measure
@@ -101,6 +103,21 @@ class UnknownMeasure(object):
 
     def get_measurement_parts(self):
         return self.measure, self.original_unit, self.value
+
+    def __eq__(self, other):
+        if isinstance(other, UnknownMeasure):
+            if self.measure == other.measure:
+                if self.value == other.value:
+                    return True
+        return False
+
+    def __lt__(self, other):
+        if isinstance(other, UnknownMeasure):
+            if self.measure == other.measure:
+                if self.value < other.value:
+                    return True
+                return False
+        return NotImplemented
 
     def __repr__(self):
         return '%s(?=%s)' % (self.measure, self.value)
