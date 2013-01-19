@@ -5,6 +5,7 @@ __all__ = [
     'Area',
     'Weight',
     'Volume',
+    'UnknownMeasure',
 ]
 
 class Weight(MeasureBase):
@@ -86,3 +87,23 @@ class Volume(MeasureBase):
     def __init__(self, *args, **kwargs):
         super(Volume, self).__init__(*args, **kwargs)
 
+
+class UnknownMeasure(object):
+    def __init__(self, measure, original_unit, value):
+        self.measure = measure
+        self.original_unit = original_unit
+        self.value = value
+
+    def __getattr__(self, name):
+        raise AttributeError(
+            'UnknownMeasures cannot be convered to other units.'
+        )
+
+    def get_measurement_parts(self):
+        return self.measure, self.original_unit, self.value
+
+    def __repr__(self):
+        return '%s(?=%s)' % (self.measure, self.value)
+
+    def __str__(self):
+        return '%s ? (%s)' % (self.value, self.measure)

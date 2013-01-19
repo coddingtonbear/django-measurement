@@ -7,6 +7,8 @@ from django_measurement import measure
 MEASURE_OVERRIDES = getattr(settings, 'MEASURE_OVERRIDES', {})
 
 def get_measurement_parts(value):
+    if isinstance(value, measure.UnknownMeasure):
+        return value.get_measurement_parts()
     measure_name = value.__class__.__name__
     original_unit = value._default_unit
     standard_value = getattr(value, value.STANDARD_UNIT)
@@ -26,8 +28,7 @@ class MeasurementFieldDescriptor(object):
             mod = getattr(mod, comp)
         return mod
 
-    def _get_measure(self, instance):
-        measure_name = getattr(instance, self.measure_field_name)
+    def _get_measure_by_name(self, measure_name):
         if measure_name in MEASURE_OVERRIDES:
             return self._get_class_by_path(
                 MEASURE_OVERRIDES[measure_name]
@@ -41,22 +42,30 @@ class MeasurementFieldDescriptor(object):
         if instance is None:
             return self
 
+        measure_name = getattr(
+            instance, 
+            self.measure_field_name
+        )
+        measurement_value = getattr(
+            instance,
+            self.measurement_field_name,
+        )
+        original_unit = getattr(
+            instance,
+            self.original_unit_field_name,
+        )
         try:
-            instance_measure = self._get_measure(instance)
-            measurement_value = getattr(
-                instance,
-                self.measurement_field_name,
-            )
+            instance_measure = self._get_measure_by_name(measure_name)
             measurement = instance_measure(
                 **{instance_measure.STANDARD_UNIT: measurement_value}
             )
-            original_unit = getattr(
-                instance,
-                self.original_unit_field_name,
-            )
             measurement._default_unit = original_unit
-        except (AttributeError, ValueError):
-            return None
+        except (AttributeError, ImportError):
+            measurement = measure.UnknownMeasure(
+                measure=measure_name,
+                original_unit=original_unit,
+                value=measurement_value,
+            )
 
         return measurement
 
