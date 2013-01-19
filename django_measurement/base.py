@@ -54,7 +54,7 @@ else:
         def __init__(self, default_unit=None, **kwargs):
             value, self._default_unit = self.default_units(kwargs)
             setattr(self, self.STANDARD_UNIT, value)
-            if default_unit and isinstance(default_unit, six.string_types):
+            if default_unit and isinstance(default_unit, basestring):
                 self._default_unit = default_unit
 
         def _get_standard(self):
@@ -174,7 +174,7 @@ else:
             """
             val = 0.0
             default_unit = self.STANDARD_UNIT
-            for unit, value in six.iteritems(kwargs):
+            for unit, value in kwargs.items():
                 if not isinstance(value, float): value = float(value)
                 if unit in self.UNITS:
                     val += self.UNITS[unit] * value
