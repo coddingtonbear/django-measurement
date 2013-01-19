@@ -1,16 +1,4 @@
-from decimal import Decimal
-
-import django
-
-from django.contrib.gis.measure import Distance, Area
-
-if django.VERSION[0] > 1 or (django.VERSION[0] == 1 and django.VERSION[1] > 4):
-    from django.contrib.gis.measure import MeasureBase
-else:
-    from django_measurement.backports import MeasureBase
-    Distance.STANDARD_UNIT = 'm'
-    Area.STANDARD_UNIT = 'sq_m'
-
+from django_measurement.base import Distance, Area, MeasureBase
 
 __all__ = [
     'Distance',
