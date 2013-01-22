@@ -2,9 +2,8 @@ from django.conf import settings
 from django.db.models import signals
 from django.db.models.fields import CharField, FloatField, CharField, Field
 
-from django_measurement import measure
+from django_measurement import measure, utils
 
-MEASURE_OVERRIDES = getattr(settings, 'MEASURE_OVERRIDES', {})
 
 def get_measurement_parts(value):
     if isinstance(value, measure.UnknownMeasure):
@@ -21,22 +20,9 @@ class MeasurementFieldDescriptor(object):
         self.original_unit_field_name = original_unit_field_name
         self.measure_field_name = measure_field_name
 
-    def _get_class_by_path(self, path):
-        mod = __import__('.'.join(path.split('.')[:-1]))
-        components = path.split('.')
-        for comp in components[1:]:
-            mod = getattr(mod, comp)
-        return mod
-
     def _get_measure_by_name(self, measure_name):
-        if measure_name in MEASURE_OVERRIDES:
-            return self._get_class_by_path(
-                MEASURE_OVERRIDES[measure_name]
-            )
-        return getattr(
-            measure,
-            measure_name
-        )
+        measures = utils.build_measure_list()
+        return measures[measure_name]
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
@@ -56,11 +42,13 @@ class MeasurementFieldDescriptor(object):
         )
         try:
             instance_measure = self._get_measure_by_name(measure_name)
-            measurement = instance_measure(
-                **{instance_measure.STANDARD_UNIT: measurement_value}
+            measurement = utils.get_measurement(
+                instance_measure,
+                measurement_value,
+                instance_measure.STANDARD_UNIT,
             )
             measurement._default_unit = original_unit
-        except (AttributeError, ImportError):
+        except (AttributeError, KeyError, ImportError):
             measurement = measure.UnknownMeasure(
                 measure=measure_name,
                 original_unit=original_unit,

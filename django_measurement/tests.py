@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from fields import MeasurementField
 import measure
+import utils
 
 class MeasurementTestModel(models.Model):
     measurement = MeasurementField()
@@ -15,8 +16,10 @@ class MeasurementFieldTest(TestCase):
         arbitrary_default_unit='lb'
         arbitrary_value=124
         arbitrary_measure=measure.Weight
-        arbitrary_measurement=arbitrary_measure(
-            **{arbitrary_default_unit: arbitrary_value}
+        arbitrary_measurement=utils.get_measurement(
+            arbitrary_measure,
+            arbitrary_value,
+            arbitrary_default_unit,
         )
 
         instance = MeasurementTestModel.objects.create(
@@ -81,3 +84,42 @@ class MeasurementFieldTest(TestCase):
             first.measurement,
             second.measurement,
         )
+
+class MeasurementUtilsTest(TestCase):
+    def test_guess_measurement_weight(self):
+        expected_measurement = measure.Weight(mcg=101)
+        actual_measurement = utils.guess_measurement(
+            101,
+            'mcg',
+        )
+
+        self.assertEqual(
+            expected_measurement,
+            actual_measurement,
+        )
+
+    def test_guess_measurement_distance(self):
+        expected_measurement = measure.Distance(mi=2144)
+        actual_measurement = utils.guess_measurement(
+            2144,
+            'mi',
+        )
+
+        self.assertEqual(
+            expected_measurement,
+            actual_measurement,
+        )
+
+    def test_get_measurement(self):
+        expected_measurement = measure.Volume(us_qt=34)
+        actual_measurement = utils.get_measurement(
+            measure.Volume,
+            34,
+            'us_qt',
+        )
+
+        self.assertEqual(
+            expected_measurement,
+            actual_measurement,
+        )
+
