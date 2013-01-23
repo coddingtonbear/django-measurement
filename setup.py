@@ -4,7 +4,7 @@ tests_require=['django']
 
 setup(
     name='django-measurement',
-    version='0.9',
+    version='0.9.1',
     url='http://bitbucket.org/latestrevision/django-measurement/',
     description='Convenient fields and classes for handling measurements',
     author='Adam Coddington',
