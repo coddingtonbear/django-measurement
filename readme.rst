@@ -6,4 +6,5 @@ Django-measurement
 A simple Django app providing for
 a simple way of using and storing weights and measures.
 
-Docs are available at `ReadTheDocs <http://django-measurement.readthedocs.org/>`_.
+Documentation for django-measurement is available on
+`ReadTheDocs <http://django-measurement.readthedocs.org/>`_.
