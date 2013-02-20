@@ -41,6 +41,9 @@ class MeasurementFormField(forms.MultiValueField):
         Return a single value for the given list of values. The values can be
         assumed to be valid.
         """
+        v = data_list[0]
+        if v==None or v=="" or (isinstance(v, str) and v.strip()==""):
+            return None 
         rv = django_measurement.utils.get_measurement( self.measurement_class, data_list[0], data_list[1] )
         return rv
 
@@ -71,4 +74,4 @@ class MeasurementFormMixin(object):
             if isinstance( value, django_measurement.base.MeasureBase) or \
                isinstance( value, django.contrib.gis.measure.MeasureBase):
                     setattr( self.instance, field_name, value) 
-        super(MeasurementFormMixin, self).save(commit)
+        return super(MeasurementFormMixin, self).save(commit)
