@@ -1,3 +1,5 @@
+kdahlhaus's fork of django-measure
+
 A simple Django app providing for
 a simple way of using and storing weights and measures.
 
