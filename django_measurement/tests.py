@@ -42,9 +42,47 @@ class MeasurementFieldTest(TestCase):
             arbitrary_value,
         )
 
+    def test_retrieval_of_mismatched_measure(self):
+        arbitrary_default_unit='g'
+        arbitrary_measure_name='Weight(a)'
+        arbitrary_value=2324
+
+        instance = MeasurementTestModel()
+        instance.measurement_value=arbitrary_value
+        instance.measurement_measure=arbitrary_measure_name
+        instance.measurement_unit=arbitrary_default_unit
+        instance.save()
+
+        measurement = MeasurementTestModel.objects.all()[0]
+
+        with self.assertRaises(ValueError):
+            measurement.measurement
+
+    def test_retrieval_of_unit_unspecified_measure(self):
+        arbitrary_default_unit='g'
+        arbitrary_measure_name='Weight'
+        arbitrary_value=2324
+
+        instance = MeasurementTestModel()
+        instance.measurement_value=arbitrary_value
+        instance.measurement_measure=arbitrary_measure_name
+        instance.measurement_unit=arbitrary_default_unit
+        instance.save()
+
+        retrieved = MeasurementTestModel.objects.all()[0]
+
+        weight = measure.Weight(
+            g=arbitrary_value
+        )
+
+        self.assertEqual(
+            weight,
+            retrieved.measurement
+        )
+
     def test_retrieval_of_unknown_measure_returns_unknown_measure(self):
         arbitrary_default_unit='versta'
-        arbitrary_measure_name='ImperialRussian'
+        arbitrary_measure_name='ImperialRussian(versta)'
         arbitrary_value=3731.5
 
         instance = MeasurementTestModel()
@@ -62,7 +100,7 @@ class MeasurementFieldTest(TestCase):
 
     def test_storage_of_unknown_measure_stores_same_measure(self):
         arbitrary_default_unit='versta'
-        arbitrary_measure_name='ImperialRussian'
+        arbitrary_measure_name='ImperialRussian(versta)'
         arbitrary_value=3731.5
 
         instance = MeasurementTestModel()
