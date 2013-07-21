@@ -1,10 +1,14 @@
 from setuptools import setup
 
+requirements = []
+with open('requirements.txt', 'r') as in_:
+    requirements = in_.readlines()
+
 tests_require=['django']
 
 setup(
     name='django-measurement',
-    version='0.9.2',
+    version='0.9.9',
     url='http://bitbucket.org/latestrevision/django-measurement/',
     description='Convenient fields and classes for handling measurements',
     author='Adam Coddington',
@@ -12,6 +16,7 @@ setup(
     tests_require=tests_require,
     extras_require={'test': tests_require},
     test_suite='django_measurement.runtests.runtests',
+    install_requires=requirements,
     classifiers=[
         'Framework :: Django',
         'Intended Audience :: Developers',

@@ -1,9 +1,8 @@
 from django.db import models
 from django.test import TestCase
 
-from fields import MeasurementField
-import measure
-import utils
+from django_measurement.fields import MeasurementField
+from django_measurement import measure, utils
 
 class MeasurementTestModel(models.Model):
     measurement = MeasurementField()
@@ -12,6 +11,64 @@ class MeasurementTestModel(models.Model):
         return unicode(self.pk)
 
 class MeasurementFieldTest(TestCase):
+    def test_storage_of_standard_measurement(self):
+        measurement = measure.Weight(g=20)
+
+        instance = MeasurementTestModel()
+        instance.measurement = measurement
+        instance.save()
+
+        retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
+
+        self.assertEquals(
+            retrieved.measurement,
+            measurement
+        )
+
+    def test_storage_of_bidimensional_measurement(self):
+        measurement = measure.Speed(mph=20)
+
+        instance = MeasurementTestModel()
+        instance.measurement = measurement
+        instance.save()
+
+        retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
+
+        self.assertEquals(
+            retrieved.measurement,
+            measurement
+        )
+
+    def test_storage_and_retrieval_of_bidimensional_measurement(self):
+        arbitrary_default_unit='mi__hr'
+        arbitrary_value=65
+        arbitrary_measure=measure.Speed
+        arbitrary_measurement=utils.get_measurement(
+            arbitrary_measure,
+            arbitrary_value,
+            arbitrary_default_unit,
+        )
+
+        instance = MeasurementTestModel.objects.create(
+            measurement=arbitrary_measurement
+        )
+        instance.save()
+
+        retrieved = MeasurementTestModel.objects.all()[0]
+
+        self.assertEqual(
+            retrieved.measurement.unit,
+            arbitrary_default_unit,
+        )
+        self.assertEqual(
+            retrieved.measurement.__class__,
+            arbitrary_measure,
+        )
+        self.assertAlmostEqual(
+            retrieved.measurement.mi__hr,
+            arbitrary_value,
+        )
+
     def test_storage_and_retrieval_of_measurement(self):
         arbitrary_default_unit='lb'
         arbitrary_value=124

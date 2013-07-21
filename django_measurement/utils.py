@@ -1,7 +1,8 @@
-import inspect
-
 from django.conf import settings
+from measurement.base import BidimensionalMeasure
+from measurement.utils import get_all_measures, guess as guess_measurement
 
+from django_measurement.measure import UnknownMeasure
 
 MEASURE_OVERRIDES = getattr(settings, 'MEASURE_OVERRIDES', {})
 
@@ -18,6 +19,10 @@ def get_measure_unit_choices(include_measure=False):
     measures = build_measure_list()
     final_list = []
     for measure_name, measure in measures.items():
+        if issubclass(measure, UnknownMeasure):
+            continue
+        if issubclass(measure, BidimensionalMeasure):
+            continue
         measure_items = []
         for unit_name, _ in measure.UNITS.items():
             measure_items.append(
@@ -29,34 +34,24 @@ def get_measure_unit_choices(include_measure=False):
 
 
 def build_measure_list():
-    from django.contrib.gis.measure import MeasureBase as DjangoMeasureBase
-    from django_measurement.base import MeasureBase
-    from django_measurement import measure
-    measures = {}
-    possible_measures = dir(measure)
-    for possible_measure_name in possible_measures:
-        possible_measure = getattr(measure, possible_measure_name)
-        if not inspect.isclass(possible_measure):
-            continue
-        if issubclass(possible_measure, (MeasureBase, DjangoMeasureBase, )) and MeasureBase != possible_measure:
-            measures[possible_measure_name] = possible_measure
+    all_measures = get_all_measures()
+    measures = dict([(measure.__name__, measure) for measure in all_measures])
     for overridden_measure_name, cls_path in MEASURE_OVERRIDES.items():
         cls = get_class_by_path(
             cls_path
         )
         measures[overridden_measure_name] = cls
+    # For unknown retrieved measures
+    measures['UnknownMeasure'] = UnknownMeasure
     return measures
 
 
-def get_measurement(measure, value, unit):
-    return measure(
+def get_measurement(measure, value, unit, original_unit=None):
+    m = measure(
         **{unit: value}
     )
-    
-
-def guess_measurement(value, unit):
-    all_measures = build_measure_list()
-    for measure_name, measure in all_measures.items():
-        all_units = getattr(measure, 'UNITS', {}).keys()
-        if unit in all_units:
-            return get_measurement(measure, value, unit)
+    if original_unit:
+        m.unit = original_unit
+    if isinstance(m, BidimensionalMeasure):
+        m.reference.value = 1
+    return m

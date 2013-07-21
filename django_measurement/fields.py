@@ -1,11 +1,11 @@
 import logging
 import re
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import signals
-from django.db.models.fields import CharField, FloatField, CharField, Field
+from django.db.models.fields import CharField, Field
 from django import forms
+from measurement.base import MeasureBase, BidimensionalMeasure
 
 from django_measurement import measure, utils
 
@@ -36,13 +36,12 @@ def get_measurement_parts(value):
         value.__class__.__name__,
         value.STANDARD_UNIT
     )
-    measure_name = value.__class__.__name__
-    original_unit = value._default_unit
-    standard_value = getattr(value, value.STANDARD_UNIT)
+    original_unit = value.unit
+    standard_value = value.standard
     return measure_name, original_unit, standard_value
 
 class MeasurementFieldDescriptor(object):
-    MEASUREMENT_NAME_RE = re.compile(r'([a-zA-Z0-9]+)(?:\(([a-zA-Z0-9]+)\))?')
+    MEASUREMENT_NAME_RE = re.compile(r'([a-zA-Z0-9]+)(?:\(([a-zA-Z0-9_]+)\))?')
 
     def __init__(self, field, measurement_field_name, original_unit_field_name, measure_field_name):
         self.field = field
@@ -90,8 +89,8 @@ class MeasurementFieldDescriptor(object):
                 instance_measure,
                 measurement_value,
                 instance_measure.STANDARD_UNIT,
+                original_unit=original_unit
             )
-            measurement._default_unit = original_unit
         except (AttributeError, KeyError, ImportError):
             measurement = measure.UnknownMeasure(
                 measure=measure_name,
