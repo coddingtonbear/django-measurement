@@ -3,14 +3,25 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db.models import signals
-from django.db.models.fields import CharField, Field
+from django.db.models.fields import CharField, Field, FloatField
 from django import forms
-from measurement.base import MeasureBase, BidimensionalMeasure
 
 from django_measurement import measure, utils
 
 
 logger = logging.getLogger(__name__)
+
+
+class OriginalUnitField(CharField):
+    pass
+
+
+class MeasureNameField(CharField):
+    pass
+
+
+class MeasurementValueField(FloatField):
+    pass
 
 
 class MeasurementFormField(forms.CharField):
@@ -60,12 +71,17 @@ class MeasurementFieldDescriptor(object):
         if instance is None:
             return self
 
-        measure_name, std_unit = self._get_measure_name_and_std_unit(
-            getattr(
-                instance, 
-                self.measure_field_name
-            )
+        measure_packed = getattr(
+            instance, 
+            self.measure_field_name
         )
+        if measure_packed:
+            measure_name, std_unit = self._get_measure_name_and_std_unit(
+                    measure_packed
+            )
+        else:
+            measure_name = ''
+            std_unit = ''
         measurement_value = getattr(
             instance,
             self.measurement_field_name,
@@ -74,6 +90,9 @@ class MeasurementFieldDescriptor(object):
             instance,
             self.original_unit_field_name,
         )
+        if not measure_name or not original_unit:
+            return ''
+
         try:
             instance_measure = self._get_measure_by_name(measure_name)
             if std_unit and instance_measure.STANDARD_UNIT != std_unit:
@@ -104,11 +123,16 @@ class MeasurementFieldDescriptor(object):
         if instance is None:
             raise AttributeError("Must be accessed via instance")
 
-        measure_name, original_unit, standard_value = get_measurement_parts(
-            measurement
-        )
+        if measurement:
+            measure, original_unit, standard_value = get_measurement_parts(
+                measurement
+            )
+        else:
+            measure = ''
+            original_unit = ''
+            standard_value = 0
         
-        setattr(instance, self.measure_field_name, measure_name)
+        setattr(instance, self.measure_field_name, measure)
         setattr(instance, self.original_unit_field_name, original_unit)
         setattr(instance, self.measurement_field_name, standard_value)
 
@@ -135,7 +159,7 @@ class MeasurementField(Field):
         self.name = name
 
         original_unit_field_name = self.get_original_unit_field_name()
-        self.original_unit_field = CharField(
+        self.original_unit_field = OriginalUnitField(
             editable=False,
             blank=True,
             default='',
@@ -144,7 +168,7 @@ class MeasurementField(Field):
         cls.add_to_class(original_unit_field_name, self.original_unit_field)
 
         measure_field_name = self.get_measure_field_name()
-        self.measure_field = CharField(
+        self.measure_field = MeasureNameField(
             editable=False,
             blank=True,
             default='',
@@ -153,7 +177,7 @@ class MeasurementField(Field):
         cls.add_to_class(measure_field_name, self.measure_field)
 
         measurement_field_name = self.get_measurement_field_name()
-        self.measurement_field = CharField(
+        self.measurement_field = MeasurementValueField(
             editable=False,
             blank=True,
             default='',
@@ -185,5 +209,8 @@ class MeasurementField(Field):
 try:
     from south.modelsinspector import add_introspection_rules
     add_introspection_rules([], ["^django_measurement\.fields\.MeasurementField"])
+    add_introspection_rules([], ["^django_measurement\.fields\.OriginalUnitField"])
+    add_introspection_rules([], ["^django_measurement\.fields\.MeasureNameField"])
+    add_introspection_rules([], ["^django_measurement\.fields\.MeasurementValueField"])
 except ImportError:
     pass
