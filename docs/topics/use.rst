@@ -11,6 +11,6 @@ and use it for easily handling measurements like so::
     print w            # '135.0 lb'
     print w.kg         # '61.234919999999995'
 
-See `Django's documentation on Measurement Objects <https://docs.djangoproject.com/en/dev/ref/contrib/gis/measure/>`_ 
+See `Python-measurement's documentation <http://python-measurement.readthedocs.org/en/latest/topics/use.html>`_
 for more information about interacting with measurements.
 
