@@ -29,8 +29,10 @@ class MeasurementAdminForm(forms.ModelForm):
                     'required': not field.blank
                 }
         for field, fkwargs in self.MEASURE_FIELDS.items():
+            choices = [(k, k) for k in all_measures.keys()]
+            choices.insert(0, (None, ''))
             self.fields[field + '_measure'] = forms.ChoiceField(
-                choices=[(k, k) for k in all_measures.keys()],
+                choices=choices,
                 **fkwargs
             )
             self.fields[field] = forms.CharField(**fkwargs)
@@ -46,7 +48,7 @@ class MeasurementAdminForm(forms.ModelForm):
             measure_name = self.cleaned_data[field + '_measure']
             measure_value = self.cleaned_data.get(field, '')
 
-            if not measure_value:
+            if not measure_value or not measure_name:
                 continue
 
             measure = all_measures[measure_name]
@@ -57,7 +59,7 @@ class MeasurementAdminForm(forms.ModelForm):
                     matcher.group(1), unit,
                     measures=[measure]
                 )
-            except ValueError:
+            except (ValueError, AttributeError):
                 raise forms.ValidationError(
                     '%s is not a valid measurement of %s' % (
                         measure_value,
