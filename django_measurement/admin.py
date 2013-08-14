@@ -16,6 +16,7 @@ class MeasurementAdminForm(forms.ModelForm):
     MEASURE_FIELDS = {}
 
     def __init__(self, *args, **kwargs):
+        self.MEASURE_FIELDS = {}
         instance = None
         if 'instance' in kwargs:
             instance = kwargs['instance']
