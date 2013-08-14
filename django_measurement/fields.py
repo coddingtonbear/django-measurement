@@ -3,7 +3,8 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db.models import signals
-from django.db.models.fields import CharField, Field, FloatField
+
+from django.db.models.fields import CharField, Field, FloatField, NOT_PROVIDED
 from django import forms
 
 from django_measurement import measure, utils
@@ -72,7 +73,7 @@ class MeasurementFieldDescriptor(object):
             return self
 
         measure_packed = getattr(
-            instance, 
+            instance,
             self.measure_field_name
         )
         if measure_packed:
@@ -131,13 +132,13 @@ class MeasurementFieldDescriptor(object):
             measure = ''
             original_unit = ''
             standard_value = 0
-        
+
         setattr(instance, self.measure_field_name, measure)
         setattr(instance, self.original_unit_field_name, original_unit)
         setattr(instance, self.measurement_field_name, standard_value)
 
 class MeasurementField(Field):
-    def __init__(self, 
+    def __init__(self,
             *args,
             **kwargs
         ):
@@ -158,11 +159,17 @@ class MeasurementField(Field):
     def contribute_to_class(self, cls, name):
         self.name = name
 
+        if self.default is not NOT_PROVIDED:
+            parts = get_measurement_parts(self.default)
+            default_name, default_unit, default_value = parts
+        else:
+            default_name, default_unit, default_value = '', '', 0.0
+
         original_unit_field_name = self.get_original_unit_field_name()
         self.original_unit_field = OriginalUnitField(
             editable=False,
             blank=True,
-            default='',
+            default=default_unit,
             max_length=50,
         )
         cls.add_to_class(original_unit_field_name, self.original_unit_field)
@@ -171,7 +178,7 @@ class MeasurementField(Field):
         self.measure_field = MeasureNameField(
             editable=False,
             blank=True,
-            default='',
+            default=default_name,
             max_length=255,
         )
         cls.add_to_class(measure_field_name, self.measure_field)
@@ -180,7 +187,7 @@ class MeasurementField(Field):
         self.measurement_field = MeasurementValueField(
             editable=False,
             blank=True,
-            default='',
+            default=default_value,
             max_length=50,
         )
         cls.add_to_class(measurement_field_name, self.measurement_field)
