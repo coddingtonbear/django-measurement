@@ -9,7 +9,7 @@ tests_require=['django']
 setup(
     name='django-measurement',
     version='1.2',
-    url='http://bitbucket.org/latestrevision/django-measurement/',
+    url='http://github.com/latestrevision/django-measurement/',
     description='Convenient fields and classes for handling measurements',
     author='Adam Coddington',
     author_email='me@adamcoddington.net',

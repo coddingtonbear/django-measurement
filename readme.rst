@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/latestrevision/django-measurement.png?branch=master
+   :target: https://travis-ci.org/latestrevision/django-measurement
+
 Easily use, manipulate, and store unit-aware measurement objects using Python
 and Django.
 
@@ -7,7 +10,7 @@ unit-aware distance measurement, but also for converting between different
 units and adding/subtracting these objects from one another.
 
 This module provides for a django model field and admin interface for storing
-any measurements provided by `python-measurement <https://bitbucket.org/latestrevision/python-measurement>`_.
+any measurements provided by `python-measurement <https://github.com/latestrevision/python-measurement>`_.
 
 Example use with a model:
 
@@ -30,7 +33,7 @@ Example use with a model:
    entry.save()
 
 These stored measurement objects can be used in all of the usual ways supported
-by `python-measurement <https://bitbucket.org/latestrevision/python-measurement>`_
+by `python-measurement <https://github.com/latestrevision/python-measurement>`_
 too:
 
 .. code-block:: python
@@ -44,13 +47,10 @@ too:
    >>> added_together.kg  # Maybe I actually need this value in kg?
    96.699
 
-.. image:: https://travis-ci.org/latestrevision/django-measurement.png?branch=master
-   :target: https://travis-ci.org/latestrevision/django-measurement
-
 - Documentation for django-measurement is available an
   `ReadTheDocs <http://django-measurement.readthedocs.org/>`_.
 - Please post issues on
-  `BitBucket <http://bitbucket.org/latestrevision/django-measurement/issues?status=new&status=open>`_.
+  `Github <http://github.com/latestrevision/django-measurement/issues>`_.
 - Test status available on
   `Travis-CI <https://travis-ci.org/latestrevision/django-measurement>`_.
 
