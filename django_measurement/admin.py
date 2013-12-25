@@ -91,7 +91,7 @@ class MeasurementAdmin(ModelAdmin):
             messages.add_message(
                 request,
                 messages.WARNING,
-                "Django-measures is currently not able to display "
+                "django-measurements is currently not able to display "
                 "measurement fields for Django versions above 1.5. "
                 "See https://github.com/latestrevision"
                 "/django-measurement/issues/3 "
