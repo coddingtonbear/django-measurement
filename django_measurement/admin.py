@@ -1,7 +1,9 @@
 import re
 
+import django
 from django import forms
 from django.contrib.admin import ModelAdmin
+from django.contrib import messages
 
 from django_measurement.fields import MeasurementValueField
 from django_measurement.utils import build_measure_list, guess_measurement
@@ -85,5 +87,18 @@ class MeasurementAdmin(ModelAdmin):
     form = MeasurementAdminForm
 
     def get_fieldsets(self, request, obj=None):
-        form = self.get_form(request, obj)(instance=obj)
-        return [(None, {'fields': form.fields.keys()})]
+        if django.VERSION[0:2] >= (1, 6):
+            messages.add_message(
+                request,
+                messages.WARNING,
+                "Django-measures is currently not able to display "
+                "measurement fields for Django versions above 1.5. "
+                "See https://github.com/latestrevision"
+                "/django-measurement/issues/3 "
+                "for more information.",
+                fail_silently=True
+            )
+        else:
+            form = self.get_form(request, obj)(instance=obj)
+            return [(None, {'fields': form.fields.keys()})]
+        return super(MeasurementAdmin, self).get_fieldsets(request, obj)
