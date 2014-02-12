@@ -9,8 +9,8 @@ import inspect
 
 class MeasurementWidget(forms.MultiWidget):
 
-    def __init__(self, attrs=None, choices=(), *args, **kwargs):
-        widgets = ( forms.TextInput(attrs=attrs), forms.Select(attrs=attrs, choices=choices) )
+    def __init__(self, attrs=None, float_widget=None, choices_widget=None, *args, **kwargs):
+        widgets = (float_widget, choices_widget)
         super(MeasurementWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):
@@ -21,20 +21,19 @@ class MeasurementWidget(forms.MultiWidget):
         return [None, None]
 
 
-
 class MeasurementFormField(forms.MultiValueField):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.measurement_class = kwargs.pop("measurement", None)
         if not self.measurement_class:
             raise Exception("MeasurementFormField requires 'measurement'=<measurement class> keyword arguement")
-        choices = kwargs.pop("choices", None)
-        if not choices:
-            choices=tuple( ((u, u) for u in self.measurement_class.UNITS))
-        defaults={'widget': MeasurementWidget(choices=choices)}
+        choices = kwargs.pop("choices", tuple(((u, u) for u in self.measurement_class.UNITS)))
+        float_field = forms.FloatField(max_value, min_value, *args, **kwargs)
+        choice_field = forms.ChoiceField(choices=choices)
+        defaults = {'widget': MeasurementWidget(float_widget=float_field.widget, choices_widget=choice_field.widget)}
         defaults.update(kwargs)
-        fields = ( forms.FloatField(), forms.ChoiceField(choices=choices) ) # have to pass in the fields or you'l get no data
-        super(MeasurementFormField, self).__init__( fields, *args, **defaults)
+        fields = (float_field, choice_field)
+        super(MeasurementFormField, self).__init__(fields, *args, **defaults)
 
     def compress(self, data_list):
         """
@@ -49,7 +48,7 @@ class MeasurementFormField(forms.MultiValueField):
 
 
 class MeasurementFormMixin(object):
-    "This mixin works around django's preference for db fields mapping to form fields"
+    """This mixin works around django's preference for db fields mapping to form fields"""
 
     def __init__(self, *args, **kwargs):
         """add fields to initial data (so the widgets will start with thre current values) if we have an instance.

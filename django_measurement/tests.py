@@ -1,14 +1,23 @@
 from django.db import models
 from django.test import TestCase
+from measurement.measures import Distance
+from django.forms import Form
 
 from django_measurement.fields import MeasurementField
+from django_measurement.forms import MeasurementFormField
 from django_measurement import measure, utils
+
 
 class MeasurementTestModel(models.Model):
     measurement = MeasurementField()
 
     def __unicode__(self):
         return unicode(self.pk)
+
+
+class MeasurementTestForm(Form):
+    measurement = MeasurementFormField(measurement=Distance, max_value=3.0, min_value=1.0)
+
 
 class MeasurementFieldTest(TestCase):
     def test_storage_of_standard_measurement(self):
@@ -179,6 +188,15 @@ class MeasurementFieldTest(TestCase):
             first.measurement,
             second.measurement,
         )
+
+    def test_max_value(self):
+        valid_form = MeasurementTestForm({'measurement_0': 2.0, 'measurement_1': 'mi'})
+        invalid_form = MeasurementTestForm({'measurement_0': 4.0, 'measurement_1': 'mi'})
+        self.assertTrue(valid_form.is_valid())
+        self.assertFalse(invalid_form.is_valid())
+
+
+
 
 class MeasurementUtilsTest(TestCase):
     def test_guess_measurement_weight(self):
