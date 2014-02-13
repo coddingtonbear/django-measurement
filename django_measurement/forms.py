@@ -7,30 +7,36 @@ from django_measurement.fields import MeasurementField
 
 import inspect
 
-class MeasurementWidget(forms.MultiWidget):
 
-    def __init__(self, attrs=None, float_widget=None, choices_widget=None, *args, **kwargs):
+class MeasurementWidget(forms.MultiWidget):
+    def __init__(self, attrs=None, float_widget=None, choices_widget=None, choices=None, *args, **kwargs):
+        if not float_widget:
+            float_widget = forms.TextInput(attrs=attrs)
+        if not choices_widget:
+            choices_widget = forms.Select(attrs=attrs, choices=choices)
         widgets = (float_widget, choices_widget)
         super(MeasurementWidget, self).__init__(widgets, attrs)
 
     def decompress(self, value):
         if value:
-            magnitude = getattr( value, value._default_unit)
-            unit = value._default_unit # TODO: this should be the unit that was entered by the user
-            return [ magnitude, unit ]
+            magnitude = getattr(value, value._default_unit)
+            unit = value._default_unit  # TODO: this should be the unit that was entered by the user
+            return [magnitude, unit]
         return [None, None]
 
 
 class MeasurementFormField(forms.MultiValueField):
-
-    def __init__(self, max_value=None, min_value=None, *args, **kwargs):
+    def __init__(self, max_value=None, min_value=None, choices=None, *args, **kwargs):
         self.measurement_class = kwargs.pop("measurement", None)
         if not self.measurement_class:
             raise Exception("MeasurementFormField requires 'measurement'=<measurement class> keyword arguement")
-        choices = kwargs.pop("choices", tuple(((u, u) for u in self.measurement_class.UNITS)))
+        if not choices:
+            choices = tuple(((u, u) for u in self.measurement_class.UNITS))
+
         float_field = forms.FloatField(max_value, min_value, *args, **kwargs)
         choice_field = forms.ChoiceField(choices=choices)
-        defaults = {'widget': MeasurementWidget(float_widget=float_field.widget, choices_widget=choice_field.widget)}
+        defaults = {'widget': MeasurementWidget(float_widget=float_field.widget, choices_widget=choice_field.widget,
+                                                choices=choices)}
         defaults.update(kwargs)
         fields = (float_field, choice_field)
         super(MeasurementFormField, self).__init__(fields, *args, **defaults)
@@ -41,9 +47,9 @@ class MeasurementFormField(forms.MultiValueField):
         assumed to be valid.
         """
         v = data_list[0]
-        if v==None or v=="" or (isinstance(v, str) and v.strip()==""):
-            return None 
-        rv = django_measurement.utils.get_measurement( self.measurement_class, data_list[0], data_list[1] )
+        if v == None or v == "" or (isinstance(v, str) and v.strip() == ""):
+            return None
+        rv = django_measurement.utils.get_measurement(self.measurement_class, data_list[0], data_list[1])
         return rv
 
 
@@ -59,10 +65,12 @@ class MeasurementFormMixin(object):
             # have an instance, must update initial data for measure fields as model_to_dict skips them 
             # otherwise edits won't start with current value
             initial = kwargs.get("initial", {})
-            measurements = inspect.getmembers(instance, lambda x: isinstance(x, django_measurement.base.MeasureBase) or isinstance(x, django.contrib.gis.measure.MeasureBase) or isinstance(x, MeasurementField))
+            measurements = inspect.getmembers(instance, lambda x: isinstance(x,
+                                                                             django_measurement.base.MeasureBase) or isinstance(
+                x, django.contrib.gis.measure.MeasureBase) or isinstance(x, MeasurementField))
             for (name, value) in measurements:
                 initial[name] = value
-            kwargs["initial"]=initial
+            kwargs["initial"] = initial
         super(MeasurementFormMixin, self).__init__(*args, **kwargs)
 
 
@@ -70,7 +78,7 @@ class MeasurementFormMixin(object):
         """due to the way construct_instance looks at database fields in the object and skips MeasurementFields
            this function must explicitly update the instance with cleaned data before calling the normal save"""
         for (field_name, value) in self.cleaned_data.items():
-            if isinstance( value, django_measurement.base.MeasureBase) or \
-               isinstance( value, django.contrib.gis.measure.MeasureBase):
-                    setattr( self.instance, field_name, value) 
+            if isinstance(value, django_measurement.base.MeasureBase) or \
+                    isinstance(value, django.contrib.gis.measure.MeasureBase):
+                setattr(self.instance, field_name, value)
         return super(MeasurementFormMixin, self).save(commit)
