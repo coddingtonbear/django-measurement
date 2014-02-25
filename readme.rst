@@ -1,11 +1,11 @@
-.. image:: https://travis-ci.org/latestrevision/django-measurement.png?branch=master
-   :target: https://travis-ci.org/latestrevision/django-measurement
+.. image:: https://travis-ci.org/coddingtonbear/django-measurement.png?branch=master
+   :target: https://travis-ci.org/coddingtonbear/django-measurement
 
 Easily use, manipulate, and store unit-aware measurement objects using Python
 and Django.
 
 **Note**: Currently, this is not compatible with Django 1.6 or later.
-For more information, please `follow the issue tracking this limitation <https://github.com/latestrevision/django-measurement/issues/3>`__.
+For more information, please `follow the issue tracking this limitation <https://github.com/coddingtonbear/django-measurement/issues/3>`__.
 
 `django.contrib.gis.measure <https://github.com/django/django/blob/master/django/contrib/gis/measure.py>`_
 has these wonderful 'Distance' objects that can be used not only for storing a
@@ -13,7 +13,7 @@ unit-aware distance measurement, but also for converting between different
 units and adding/subtracting these objects from one another.
 
 This module provides for a django model field and admin interface for storing
-any measurements provided by `python-measurement <https://github.com/latestrevision/python-measurement>`_.
+any measurements provided by `python-measurement <https://github.com/coddingtonbear/python-measurement>`_.
 
 Example use with a model:
 
@@ -36,7 +36,7 @@ Example use with a model:
    entry.save()
 
 These stored measurement objects can be used in all of the usual ways supported
-by `python-measurement <https://github.com/latestrevision/python-measurement>`_
+by `python-measurement <https://github.com/coddingtonbear/python-measurement>`_
 too:
 
 .. code-block:: python
@@ -53,13 +53,13 @@ too:
 - Documentation for django-measurement is available an
   `ReadTheDocs <http://django-measurement.readthedocs.org/>`_.
 - Please post issues on
-  `Github <http://github.com/latestrevision/django-measurement/issues>`_.
+  `Github <http://github.com/coddingtonbear/django-measurement/issues>`_.
 - Test status available on
-  `Travis-CI <https://travis-ci.org/latestrevision/django-measurement>`_.
+  `Travis-CI <https://travis-ci.org/coddingtonbear/django-measurement>`_.
 
 
 
-.. image:: https://d2weczhvl823v0.cloudfront.net/latestrevision/django-measurement/trend.png
+.. image:: https://d2weczhvl823v0.cloudfront.net/coddingtonbear/django-measurement/trend.png
    :alt: Bitdeli badge
    :target: https://bitdeli.com/free
 
