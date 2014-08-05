@@ -93,7 +93,7 @@ class MeasurementAdmin(ModelAdmin):
                 messages.WARNING,
                 "django-measurement is currently not able to display "
                 "measurement fields for Django versions above 1.5. "
-                "See https://github.com/latestrevision"
+                "See https://github.com/coddingtonbear"
                 "/django-measurement/issues/3 "
                 "for more information.",
                 fail_silently=True
