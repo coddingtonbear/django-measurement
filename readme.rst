@@ -57,9 +57,3 @@ too:
 - Test status available on
   `Travis-CI <https://travis-ci.org/coddingtonbear/django-measurement>`_.
 
-
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/coddingtonbear/django-measurement/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
-
