@@ -1,8 +1,10 @@
+# -*- coding:utf-8 -*-
+from __future__ import (absolute_import, unicode_literals)
+
 from django.conf import settings
 from measurement.base import BidimensionalMeasure
 from measurement.utils import get_all_measures, guess as guess_measurement
-
-from django_measurement.measure import UnknownMeasure
+from .measure import UnknownMeasure
 
 MEASURE_OVERRIDES = getattr(settings, 'MEASURE_OVERRIDES', {})
 
@@ -26,7 +28,8 @@ def get_measure_unit_choices(include_measure=False):
         measure_items = []
         for unit_name, _ in measure.UNITS.items():
             measure_items.append(
-                ('%s.%s' % (measure_name, unit_name, ) if include_measure else unit_name, unit_name)
+                ('%s.%s' % (measure_name, unit_name, )
+                 if include_measure else unit_name, unit_name)
             )
         this_measure = tuple([measure_name, tuple(measure_items)])
         final_list.append(this_measure)

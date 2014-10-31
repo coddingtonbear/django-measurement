@@ -1,12 +1,15 @@
+# -*- coding:utf-8 -*-
+from __future__ import (absolute_import, unicode_literals)
+
 import re
 
 import django
+from warnings import warn
 from django import forms
 from django.contrib.admin import ModelAdmin
 from django.contrib import messages
-
-from django_measurement.fields import MeasurementValueField
-from django_measurement.utils import build_measure_list, guess_measurement
+from .fields import MeasurementValueField
+from .utils import build_measure_list, guess_measurement
 
 
 all_measures = build_measure_list()
@@ -18,6 +21,8 @@ class MeasurementAdminForm(forms.ModelForm):
     MEASURE_FIELDS = {}
 
     def __init__(self, *args, **kwargs):
+        warn(DeprecationWarning, "MeasurementAdminForm is no longer required"
+                                 " and will be removed in version 1.5")
         self.MEASURE_FIELDS = {}
         instance = None
         if 'instance' in kwargs:
