@@ -1,5 +1,8 @@
-from measurement.measures import *
+# -*- coding:utf-8 -*-
+from __future__ import (absolute_import, unicode_literals)
+
 from measurement.utils import total_ordering
+from measurement.measures import *  # NOQA
 
 
 @total_ordering

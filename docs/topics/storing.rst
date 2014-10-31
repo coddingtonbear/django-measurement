@@ -11,7 +11,7 @@ you might (naively) create a model like such::
 
     class BeerConsumptionLogEntry(Model):
         name = models.CharField(max_length=255)
-        volume = models.MeasurementField()
+        volume = models.MeasurementField(measurement=Volume)
 
         def __str__(self):
             return '%s of %s' % (self.name, self.volume, )
