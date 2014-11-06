@@ -2,9 +2,7 @@
 from __future__ import (absolute_import, unicode_literals)
 
 from django import forms
-from warnings import warn
 from measurement.base import MeasureBase
-from django.contrib import gis
 from . import utils
 
 
@@ -57,36 +55,3 @@ class MeasurementFormField(forms.MultiValueField):
             return None
         rv = utils.get_measurement(self.measurement_class, data_list[0], data_list[1])
         return rv
-
-
-class MeasurementFormMixin(object):
-    """
-    This mixin works around django's preference
-    for db fields mapping to form fields
-    """
-
-    def __init__(self, *args, **kwargs):
-        """
-        add fields to initial data
-        (so the widgets will start with thre current values) if we have an instance.
-        model_to_dict skips over the measurement fields
-        because they are not editable (and it sees them as each
-        of the 3 database fields that make up a measurement,
-        instead of the actual measurement itself
-        """
-        warn(DeprecationWarning, "MeasurementFormMixin is deprecated"
-                                 " and will be removed in versin 1.5")
-        super(MeasurementFormMixin, self).__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        """
-        due to the way construct_instance looks at database
-        fields in the object and skips MeasurementFields
-        this function must explicitly update the instance
-        with cleaned data before calling the normal save
-        """
-        for (field_name, value) in self.cleaned_data.items():
-            if isinstance(value, MeasureBase) or \
-                    isinstance(value, gis.measure.MeasureBase):
-                setattr(self.instance, field_name, value)
-        return super(MeasurementFormMixin, self).save(commit)

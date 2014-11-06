@@ -4,7 +4,6 @@ from __future__ import (absolute_import, unicode_literals)
 import logging
 
 import re
-from warnings import warn
 from django.db.models import signals, Manager
 from django.db.models.query import QuerySet
 from django.db.models import CharField, Field, FloatField, NOT_PROVIDED
@@ -120,8 +119,8 @@ class MeasurementField(Field):
                  measurement=None, choices=None,
                  max_value=None, min_value=None, *args, **kwargs):
         if not measurement:
-            warn(DeprecationWarning,
-                 "measurement should be set to use django's ModelForm.")
+            raise TypeError('MeasurementField() takes a measurement'
+                            ' keyword argument. None given.')
 
         self.widget_args = {
             'measurement': measurement,
