@@ -27,7 +27,7 @@ class PyTest(Command):
 
 setup(
     name='django-measurement',
-    version='1.4',
+    version='1.5',
     url='http://github.com/coddingtonbear/django-measurement/',
     description='Convenient fields and classes for handling measurements',
     author='Adam Coddington',
@@ -36,11 +36,17 @@ setup(
     extras_require={'test': tests_require},
     install_requires=requirements,
     classifiers=[
+        'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
+        'Environment :: Web Environment',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
     ],
     packages=[
         'django_measurement',
