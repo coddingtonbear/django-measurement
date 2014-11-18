@@ -1,226 +1,164 @@
 from django.test import TestCase
-from django_measurement import utils, measure
+from measurement import measures
 from tests.forms import MeasurementTestForm
 from tests.models import MeasurementTestModel
 
 
 class TestMeasurementField(TestCase):
     def test_storage_of_standard_measurement(self):
-        measurement = measure.Weight(g=20)
+        measurement = measures.Weight(g=20)
 
         instance = MeasurementTestModel()
-        instance.measurement = measurement
+        instance.measurement_weight = measurement
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
         self.assertEquals(
-            retrieved.measurement,
+            retrieved.measurement_weight,
             measurement
         )
 
-    def test_storage_of_bidimensional_measurement(self):
-        measurement = measure.Speed(mph=20)
+    def test_storage_of_temperature(self):
+        measurement = measures.Temperature(c=20)
 
         instance = MeasurementTestModel()
-        instance.measurement = measurement
+        instance.measurement_temperature = measurement
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
         self.assertEquals(
-            retrieved.measurement,
+            retrieved.measurement_temperature,
+            measurement
+        )
+
+    def test_storage_of_string_value(self):
+        instance = MeasurementTestModel()
+        instance.measurement_weight = "21.4"
+        instance.save()
+
+        retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
+
+        self.assertEquals(
+            retrieved.measurement_weight,
+            measures.Weight(g=21.4),
+        )
+
+    def test_storage_of_float_value(self):
+        instance = MeasurementTestModel()
+        instance.measurement_weight = 21.4
+        instance.save()
+
+        retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
+
+        self.assertEquals(
+            retrieved.measurement_weight,
+            measures.Weight(g=21.4),
+        )
+
+    def test_storage_of_bidimensional_measurement(self):
+        measurement = measures.Speed(mph=20)
+
+        instance = MeasurementTestModel()
+        instance.measurement_speed = measurement
+        instance.save()
+
+        retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
+
+        self.assertEquals(
+            retrieved.measurement_speed,
             measurement
         )
 
     def test_storage_and_retrieval_of_bidimensional_measurement(self):
-        arbitrary_default_unit = 'mi__hr'
-        arbitrary_value = 65
-        arbitrary_measure = measure.Speed
-        arbitrary_measurement = utils.get_measurement(
-            arbitrary_measure,
-            arbitrary_value,
-            arbitrary_default_unit,
-        )
-
-        instance = MeasurementTestModel.objects.create(
-            measurement=arbitrary_measurement
-        )
-        instance.save()
-
-        retrieved = MeasurementTestModel.objects.all()[0]
-
-        self.assertEqual(
-            retrieved.measurement.unit,
-            arbitrary_default_unit,
-        )
-        self.assertEqual(
-            retrieved.measurement.__class__,
-            arbitrary_measure,
-        )
-        self.assertAlmostEqual(
-            retrieved.measurement.mi__hr,
-            arbitrary_value,
-        )
-
-    def test_storage_and_retrieval_of_measurement(self):
-        arbitrary_default_unit = 'lb'
-        arbitrary_value = 124
-        arbitrary_measure = measure.Weight
-        arbitrary_measurement = utils.get_measurement(
-            arbitrary_measure,
-            arbitrary_value,
-            arbitrary_default_unit,
-        )
-
-        instance = MeasurementTestModel.objects.create(
-            measurement=arbitrary_measurement
-        )
-        instance.save()
-
-        retrieved = MeasurementTestModel.objects.all()[0]
-
-        self.assertEqual(
-            retrieved.measurement._default_unit,
-            arbitrary_default_unit,
-        )
-        self.assertEqual(
-            retrieved.measurement.__class__,
-            arbitrary_measure,
-        )
-        self.assertAlmostEqual(
-            retrieved.measurement.lb,
-            arbitrary_value,
-        )
-
-    def test_retrieval_of_mismatched_measure(self):
-        arbitrary_default_unit = 'g'
-        arbitrary_measure_name = 'Weight(a)'
-        arbitrary_value = 2324
-
-        instance = MeasurementTestModel()
-        instance.measurement_value = arbitrary_value
-        instance.measurement_measure = arbitrary_measure_name
-        instance.measurement_unit = arbitrary_default_unit
-        instance.save()
-
-        measurement = MeasurementTestModel.objects.all()[0]
-
-        with self.assertRaises(ValueError):
-            measurement.measurement
-
-    def test_retrieval_of_unit_unspecified_measure(self):
-        arbitrary_default_unit = 'g'
-        arbitrary_measure_name = 'Weight'
-        arbitrary_value = 2324
-
-        instance = MeasurementTestModel()
-        instance.measurement_value = arbitrary_value
-        instance.measurement_measure = arbitrary_measure_name
-        instance.measurement_unit = arbitrary_default_unit
-        instance.save()
-
-        retrieved = MeasurementTestModel.objects.all()[0]
-
-        weight = measure.Weight(
-            g=arbitrary_value
-        )
-
-        self.assertEqual(
-            weight,
-            retrieved.measurement
-        )
-
-    def test_retrieval_of_unknown_measure_returns_unknown_measure(self):
-        arbitrary_default_unit = 'versta'
-        arbitrary_measure_name = 'ImperialRussian(versta)'
-        arbitrary_value = 3731.5
-
-        instance = MeasurementTestModel()
-        instance.measurement_value = arbitrary_value
-        instance.measurement_measure = arbitrary_measure_name
-        instance.measurement_unit = arbitrary_default_unit
-        instance.save()
-
-        retrieved = MeasurementTestModel.objects.all()[0]
-
-        self.assertIsInstance(
-            retrieved.measurement,
-            measure.UnknownMeasure
-        )
-
-    def test_storage_of_unknown_measure_stores_same_measure(self):
-        arbitrary_default_unit = 'versta'
-        arbitrary_measure_name = 'ImperialRussian(versta)'
-        arbitrary_value = 3731.5
-
-        instance = MeasurementTestModel()
-        instance.measurement_value = arbitrary_value
-        instance.measurement_measure = arbitrary_measure_name
-        instance.measurement_unit = arbitrary_default_unit
-        instance.save()
-
-        retrieved = MeasurementTestModel.objects.all()[0]
+        original_value = measures.Speed(mph=65)
 
         MeasurementTestModel.objects.create(
-            measurement=retrieved.measurement
+            measurement_speed=original_value,
         )
 
-        first = MeasurementTestModel.objects.all()[0]
-        second = MeasurementTestModel.objects.all()[1]
+        retrieved = MeasurementTestModel.objects.get()
 
-        self.assertEqual(
-            first.measurement,
-            second.measurement,
+        new_value = retrieved.measurement_speed
+
+        self.assertEqual(new_value, original_value)
+        self.assertEqual(type(new_value), type(original_value))
+        self.assertEqual(new_value.unit, original_value.STANDARD_UNIT)
+
+    def test_storage_and_retrieval_of_bidimensional_measurement_choice(self):
+        original_value = measures.Speed(mph=65)
+
+        MeasurementTestModel.objects.create(
+            measurement_speed_mph=original_value,
         )
 
+        retrieved = MeasurementTestModel.objects.get()
+
+        new_value = retrieved.measurement_speed_mph
+
+        self.assertEqual(new_value, original_value)
+        self.assertEqual(type(new_value), type(original_value))
+        self.assertEqual(new_value.unit, original_value.unit)
+
+    def test_storage_and_retrieval_of_measurement(self):
+        original_value = measures.Weight(lb=124)
+
+        MeasurementTestModel.objects.create(
+            measurement_weight=original_value,
+        )
+
+        retrieved = MeasurementTestModel.objects.get()
+        new_value = retrieved.measurement_weight
+
+        self.assertEqual(new_value, original_value)
+        self.assertEqual(type(new_value), type(original_value))
+        self.assertEqual(new_value.unit, original_value.STANDARD_UNIT)
+
+    def test_storage_and_retrieval_of_measurement_choice(self):
+        original_value = measures.Distance(km=100)
+
+        MeasurementTestModel.objects.create(
+            measurement_distance_km=original_value,
+        )
+
+        retrieved = MeasurementTestModel.objects.get()
+        new_value = retrieved.measurement_distance_km
+
+        self.assertEqual(new_value, original_value)
+        self.assertEqual(type(new_value), type(original_value))
+        self.assertEqual(new_value.unit, original_value.unit)
+
+
+class TestMeasurementFormField(object):
     def test_max_value(self):
         valid_form = MeasurementTestForm({
-            'measurement_0': 2.0,
-            'measurement_1': 'mi',
+            'measurement_distance_0': 2.0,
+            'measurement_distance_1': 'mi',
         })
         invalid_form = MeasurementTestForm({
-            'measurement_0': 4.0,
-            'measurement_1': 'mi',
+            'measurement_distance_0': 4.0,
+            'measurement_distance_1': 'mi',
         })
-        self.assertTrue(valid_form.is_valid())
-        self.assertFalse(invalid_form.is_valid())
+        assert valid_form.is_valid()
+        assert not invalid_form.is_valid()
 
+    def test_form_storage(self):
+        form = MeasurementTestForm({
+            'measurement_distance_0': 2.0,
+            'measurement_distance_1': 'mi',
+        })
+        assert form.is_valid()
+        obj = form.save()
 
-class TestMeasurementUtils(TestCase):
-    def test_guess_measurement_weight(self):
-        expected_measurement = measure.Weight(mcg=101)
-        actual_measurement = utils.guess_measurement(
-            101,
-            'mcg',
-        )
+        assert obj.measurement_distance == measures.Distance(mi=2)
 
-        self.assertEqual(
-            expected_measurement,
-            actual_measurement,
-        )
+    def test_form_bidir(self):
+        form = MeasurementTestForm({
+            'measurement_speed_0': 2.0,
+            'measurement_speed_1': 'mi__hr',
+        })
+        assert form.is_valid()
+        obj = form.save()
 
-    def test_guess_measurement_distance(self):
-        expected_measurement = measure.Distance(mi=2144)
-        actual_measurement = utils.guess_measurement(
-            2144,
-            'mi',
-        )
-
-        self.assertEqual(
-            expected_measurement,
-            actual_measurement,
-        )
-
-    def test_get_measurement(self):
-        expected_measurement = measure.Volume(us_qt=34)
-        actual_measurement = utils.get_measurement(
-            measure.Volume,
-            34,
-            'us_qt',
-        )
-
-        self.assertEqual(
-            expected_measurement,
-            actual_measurement,
-        )
+        assert obj.measurement_speed == measures.Speed(mi__hr=2)
