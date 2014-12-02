@@ -2,26 +2,23 @@
 Using Measurement Objects in Forms
 ==================================
 
-Measurement objects need some help in forms because they break Django's normal assumption of a direct relationship between database field and form field (since measurement objects have 3 database columns each).
+This is an example for a simple form field usage::
 
-This is accomplished with the MeasurementFormMixin::
+    from django import forms
+    from django_measurement.forms import MeasurementField
 
-    from django_measurement.forms import MeasurementFormField, MeasurementFormMixin 
+    class BeerForm(forms.Form):
 
-    class BeerForm(MeasurementFormMixin, ModelForm):
+        volume = MeasurementField(Volume)
 
-        volume = MeasurementFormField(measurement=Volume)  
+You can limit the units in the select field by using the 'unit_choices' keyword argument.
+To limit the value choices of the MeasurementField uses the regular 'choices' keyword argument::
 
-        def __init__(self,*args,**kwargs):
-            super (BeerForm, self).__init__(*args,**kwargs)
-            self.fields['volume'].label="Volume"
+    class BeerForm(forms.Form):
 
-
-You can limit the units in the select field by using the 'choices' keyword::
-
-    class BeerForm(MeasurementFormMixin, ModelForm):
-
-        volume = MeasurementFormField( measurement=Volume, choices=(("l","l"), ("oz","oz")))
+        volume = MeasurementField(
+            measurement=Volume,
+            unit_choices=(("l","l"), ("oz","oz")),
+            choices=((1.0, 'one'), (2.0, 'two'))
+        )
  
-
-

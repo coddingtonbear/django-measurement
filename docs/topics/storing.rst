@@ -11,7 +11,7 @@ you might (naively) create a model like such::
 
     class BeerConsumptionLogEntry(Model):
         name = models.CharField(max_length=255)
-        volume = models.MeasurementField(measurement=Volume)
+        volume = models.MeasurementField(Volume)
 
         def __str__(self):
             return '%s of %s' % (self.name, self.volume, )
@@ -52,10 +52,4 @@ that the unit is abstracted to the measure's standard unit for storage and compa
 How is this data stored?
 ------------------------
 
-In the above example, we created a model field named ``volume``, 
-this would be realized in three columns:
-
-- ``volume_unit``: Stores the originally-specified unit.
-- ``volume_measure``: Stores the measurement's measure ('Weight', 'Volume', 'Distance', etc.).
-- ``volume_value``: Stores the float value of the measurement in the measure's standard unit.
-
+Since django-measurement v2.0 there value will be stored in a single float field.

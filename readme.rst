@@ -10,7 +10,7 @@
 Easily use, manipulate, and store unit-aware measurement objects using Python
 and Django.
 
-**Note**: Currently, this is only compatible with Django 1.6 or later.
+**Note**: Version 2.0 has no backward compatibility due to major design changes.
 
 `django.contrib.gis.measure <https://github.com/django/django/blob/master/django/contrib/gis/measure.py>`_
 has these wonderful 'Distance' objects that can be used not only for storing a
@@ -24,13 +24,13 @@ Example use with a model:
 
 .. code-block:: python
 
-   from django_measurement.fields import MeasurementField
+   from django_measurement.models import MeasurementField
    from django_measurement.measure import Volume
    from django.db import models
    
    class BeerConsumptionLogEntry(models.Model):
        name = models.CharField(max_length=255)
-       volume = MeasurementField(measurement=Volume)
+       volume = MeasurementField(Volume)
    
        def __unicode__(self):
            return u"%s of %s" % (self.name, self.volume)

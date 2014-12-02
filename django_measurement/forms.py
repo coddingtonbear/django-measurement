@@ -5,6 +5,7 @@ from itertools import product
 
 from django import forms
 from measurement.base import MeasureBase, BidimensionalMeasure
+
 from . import utils
 
 
@@ -18,7 +19,10 @@ class MeasurementWidget(forms.MultiWidget):
             float_widget = forms.TextInput(attrs=attrs)
 
         if not unit_choices_widget:
-            unit_choices_widget = forms.Select(attrs=attrs, choices=unit_choices)
+            unit_choices_widget = forms.Select(
+                attrs=attrs,
+                choices=unit_choices
+            )
 
         widgets = (float_widget, unit_choices_widget)
         super(MeasurementWidget, self).__init__(widgets, attrs)
@@ -40,12 +44,14 @@ class MeasurementWidget(forms.MultiWidget):
         return [None, None]
 
 
-class MeasurementFormField(forms.MultiValueField):
+class MeasurementField(forms.MultiValueField):
     def __init__(self, measurement, max_value=None, min_value=None,
                  unit_choices=None, *args, **kwargs):
 
         if not issubclass(measurement, (MeasureBase, BidimensionalMeasure)):
-            raise ValueError("%s must be a subclass of MeasureBase" % measurement)
+            raise ValueError(
+                "%s must be a subclass of MeasureBase" % measurement
+            )
 
         self.measurement_class = measurement
         if not unit_choices:
@@ -69,13 +75,15 @@ class MeasurementFormField(forms.MultiValueField):
         float_field = forms.FloatField(max_value, min_value, *args, **kwargs)
         choice_field = forms.ChoiceField(choices=unit_choices)
         defaults = {
-            'widget': MeasurementWidget(float_widget=float_field.widget,
-                                        unit_choices_widget=choice_field.widget,
-                                        unit_choices=unit_choices),
+            'widget': MeasurementWidget(
+                float_widget=float_field.widget,
+                unit_choices_widget=choice_field.widget,
+                unit_choices=unit_choices
+            ),
         }
         defaults.update(kwargs)
         fields = (float_field, choice_field)
-        super(MeasurementFormField, self).__init__(fields, *args, **defaults)
+        super(MeasurementField, self).__init__(fields, *args, **defaults)
 
     def compress(self, data_list):
         if not data_list:

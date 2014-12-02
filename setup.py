@@ -27,7 +27,7 @@ class PyTest(Command):
 
 setup(
     name='django-measurement',
-    version='1.5',
+    version='2.0.0',
     url='http://github.com/coddingtonbear/django-measurement/',
     description='Convenient fields and classes for handling measurements',
     author='Adam Coddington',
