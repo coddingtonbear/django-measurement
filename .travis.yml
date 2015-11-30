@@ -1,28 +1,22 @@
 language: python
 sudo: false
+cache:
+  - pip
 python:
-  - "2.6"
   - "2.7"
-  - "3.2"
   - "3.3"
   - "3.4"
+  - "3.5"
   - "pypy"
   - "pypy3"
 env:
-  - DJANGO="<1.6,>=1.5"
-  - DJANGO="<1.7,>=1.6"
-  - DJANGO="<1.8,>=1.7"
-  - DJANGO="<1.9,>=1.8"
-
-matrix:
-  exclude:
-    - python: "2.6"
-      env: DJANGO="<1.8,>=1.7"
-    - python: "2.6"
-      env: DJANGO="<1.9,>=1.8"
+  matrix:
+    - DJANGO="Django<1.8,>=1.7"
+    - DJANGO="Django<1.9,>=1.8"
+    - DJANGO="-e git+https://github.com/django/django.git@master#egg=Django"
 install:
   - pip install --upgrade pip
-  - pip install .
+  - pip install -e .
   - pip install Django$DJANGO
   - pip install pytest pytest-pep8 pytest-flakes django-pytest
 script:
