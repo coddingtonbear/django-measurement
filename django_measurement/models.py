@@ -5,6 +5,7 @@ import six
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Field
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from measurement import measures
 from measurement.base import BidimensionalMeasure, MeasureBase
@@ -32,7 +33,7 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
                  min_value=None, max_value=None, *args, **kwargs):
 
         if not measurement and measurement_class:
-            measurement = getattr(measures, six.text_type(measurement_class))
+            measurement = getattr(measures, force_text(measurement_class))
 
         if not measurement:
             raise TypeError('MeasurementField() takes a measurement'
@@ -45,7 +46,7 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
             )
 
         self.measurement = measurement
-        self.measurement_class = six.text_type(measurement.__name__)
+        self.measurement_class = force_text(measurement.__name__)
         self.widget_args = {
             'measurement': measurement,
             'unit_choices': unit_choices,
