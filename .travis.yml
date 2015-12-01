@@ -18,6 +18,6 @@ install:
   - pip install --upgrade pip
   - pip install -e .
   - pip install $DJANGO
-  - pip install pytest pytest-pep8 pytest-flakes django-pytest
+  - pip install pytest pytest-pep8 pytest-flakes pytest-django
 script:
   - python setup.py test

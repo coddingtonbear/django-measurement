@@ -1,10 +1,16 @@
-from django.test import TestCase
+import pytest
+from django.utils import module_loading
+from django.utils.encoding import force_bytes, force_text
 from measurement import measures
 from tests.forms import MeasurementTestForm
 from tests.models import MeasurementTestModel
 
+pytestmark = [
+    pytest.mark.django_db,
+]
 
-class TestMeasurementField(TestCase):
+
+class TestMeasurementField(object):
     def test_storage_of_standard_measurement(self):
         measurement = measures.Weight(g=20)
 
@@ -14,10 +20,7 @@ class TestMeasurementField(TestCase):
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
-        self.assertEquals(
-            retrieved.measurement_weight,
-            measurement
-        )
+        assert retrieved.measurement_weight == measurement
 
     def test_storage_of_temperature(self):
         measurement = measures.Temperature(c=20)
@@ -28,10 +31,7 @@ class TestMeasurementField(TestCase):
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
-        self.assertEquals(
-            retrieved.measurement_temperature,
-            measurement
-        )
+        assert retrieved.measurement_temperature == measurement
 
     def test_storage_of_string_value(self):
         instance = MeasurementTestModel()
@@ -40,10 +40,7 @@ class TestMeasurementField(TestCase):
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
-        self.assertEquals(
-            retrieved.measurement_weight,
-            measures.Weight(g=21.4),
-        )
+        assert retrieved.measurement_weight == measures.Weight(g=21.4)
 
     def test_storage_of_float_value(self):
         instance = MeasurementTestModel()
@@ -52,10 +49,7 @@ class TestMeasurementField(TestCase):
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
-        self.assertEquals(
-            retrieved.measurement_weight,
-            measures.Weight(g=21.4),
-        )
+        assert retrieved.measurement_weight == measures.Weight(g=21.4)
 
     def test_storage_of_bidimensional_measurement(self):
         measurement = measures.Speed(mph=20)
@@ -66,10 +60,7 @@ class TestMeasurementField(TestCase):
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
-        self.assertEquals(
-            retrieved.measurement_speed,
-            measurement
-        )
+        assert retrieved.measurement_speed == measurement
 
     def test_storage_and_retrieval_of_bidimensional_measurement(self):
         original_value = measures.Speed(mph=65)
@@ -82,9 +73,9 @@ class TestMeasurementField(TestCase):
 
         new_value = retrieved.measurement_speed
 
-        self.assertEqual(new_value, original_value)
-        self.assertEqual(type(new_value), type(original_value))
-        self.assertEqual(new_value.unit, original_value.STANDARD_UNIT)
+        assert new_value == original_value
+        assert type(new_value) == type(original_value)
+        assert new_value.unit == original_value.STANDARD_UNIT
 
     def test_storage_and_retrieval_of_bidimensional_measurement_choice(self):
         original_value = measures.Speed(mph=65)
@@ -97,9 +88,9 @@ class TestMeasurementField(TestCase):
 
         new_value = retrieved.measurement_speed_mph
 
-        self.assertEqual(new_value, original_value)
-        self.assertEqual(type(new_value), type(original_value))
-        self.assertEqual(new_value.unit, original_value.unit)
+        assert new_value == original_value
+        assert type(new_value) == type(original_value)
+        assert new_value.unit == original_value.unit
 
     def test_storage_and_retrieval_of_measurement(self):
         original_value = measures.Weight(lb=124)
@@ -111,9 +102,9 @@ class TestMeasurementField(TestCase):
         retrieved = MeasurementTestModel.objects.get()
         new_value = retrieved.measurement_weight
 
-        self.assertEqual(new_value, original_value)
-        self.assertEqual(type(new_value), type(original_value))
-        self.assertEqual(new_value.unit, original_value.STANDARD_UNIT)
+        assert new_value == original_value
+        assert type(new_value) == type(original_value)
+        assert new_value.unit == original_value.STANDARD_UNIT
 
     def test_storage_and_retrieval_of_measurement_choice(self):
         original_value = measures.Distance(km=100)
@@ -125,9 +116,9 @@ class TestMeasurementField(TestCase):
         retrieved = MeasurementTestModel.objects.get()
         new_value = retrieved.measurement_distance_km
 
-        self.assertEqual(new_value, original_value)
-        self.assertEqual(type(new_value), type(original_value))
-        self.assertEqual(new_value.unit, original_value.unit)
+        assert new_value == original_value
+        assert type(new_value) == type(original_value)
+        assert new_value.unit == original_value.unit
 
 
 class TestMeasurementFormField(object):
