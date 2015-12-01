@@ -1,4 +1,6 @@
 import pytest
+from django.utils import module_loading
+from django.utils.encoding import force_bytes, force_text
 from measurement import measures
 
 from tests.forms import MeasurementTestForm
@@ -118,6 +120,58 @@ class TestMeasurementField(object):
         assert new_value == original_value
         assert type(new_value) == type(original_value)
         assert new_value.unit == original_value.unit
+
+
+@pytest.mark.parametrize('fieldname, measure_cls', [
+    ('measurement_weight', measures.Weight),
+    ('measurement_distance', measures.Distance),
+    ('measurement_distance_km', measures.Distance),
+    ('measurement_speed', measures.Speed),
+    ('measurement_temperature', measures.Temperature),
+    ('measurement_speed_mph', measures.Speed),
+])
+class TestDeconstruct(object):
+    def test_deconstruct(self, fieldname, measure_cls):
+        field = MeasurementTestModel._meta.get_field(fieldname)
+
+        name, path, args, kwargs = field.deconstruct()
+
+        assert name == fieldname
+        assert path == 'django_measurement.models.MeasurementField'
+        assert args == []
+        assert kwargs['blank'] == field.blank
+        assert kwargs['null'] == field.null
+        assert kwargs['measurement_class'] == measure_cls.__name__
+        assert kwargs['measurement_class'] == field.measurement_class
+
+        new_cls = module_loading.import_string(path)
+        new_field = new_cls(name=name, *args, **kwargs)
+
+        assert type(field) == type(new_field)
+        assert field.deconstruct() == (
+            name, path, args, kwargs
+        )
+
+    def test_deconstruct_old_migrations(self, fieldname, measure_cls):
+        field = MeasurementTestModel._meta.get_field(fieldname)
+
+        name, path, args, kwargs = field.deconstruct()
+
+        # replace str class with binary
+        kwargs['measurement_class'] = force_bytes(kwargs['measurement_class'])
+
+        new_cls = module_loading.import_string(path)
+        new_field = new_cls(name=name, *args, **kwargs)
+
+        assert type(field) == type(new_field)
+
+        _, _, _, kwargs_new = field.deconstruct()
+
+        # kwargs get corrected, cls is a str again
+        assert (
+            kwargs_new['measurement_class'] ==
+            force_text(kwargs['measurement_class'])
+        )
 
 
 class TestMeasurementFormField(object):
