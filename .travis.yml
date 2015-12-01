@@ -25,4 +25,4 @@ install:
   - pip install $DJANGO
   - pip install pytest pytest-pep8 pytest-flakes pytest-django
 script:
-  - python setup.py test
+  - py.test
