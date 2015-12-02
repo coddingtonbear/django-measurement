@@ -1,6 +1,7 @@
+from measurement import measures
+
 from django.db import models
 from django_measurement.models import MeasurementField
-from measurement import measures
 
 
 class MeasurementTestModel(models.Model):

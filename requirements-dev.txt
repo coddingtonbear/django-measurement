@@ -1,0 +1,13 @@
+-e .
+Django==1.9.0
+flake8==2.5.0
+flake8-pep257==1.0.2
+flake8-isort==0.2
+isort==4.2.2
+mccabe==0.3.1
+pep257==0.6.0
+pep8>=1.5.7,!=1.6.0,!=1.6.1,!=1.6.2
+pep8-naming==0.3.3
+py==1.4.30
+pytest==2.8.2
+pytest-django==2.9.1

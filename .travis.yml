@@ -4,25 +4,22 @@ cache:
   - pip
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "pypy"
   - "pypy3"
 env:
   matrix:
-    - DJANGO="Django<1.8,>=1.7"
     - DJANGO="Django<1.9,>=1.8"
+    - DJANGO="Django<1.10,>=1.9"
     - DJANGO="-e git+https://github.com/django/django.git@master#egg=Django"
 matrix:
   allow_failures:
-    - env: DJANGO="Django<1.8,>=1.7"
-      python: "3.5"
     - env: DJANGO="-e git+https://github.com/django/django.git@master#egg=Django"
 install:
   - pip install --upgrade pip
-  - pip install -e .
+  - pip install requirements-dev.txt
   - pip install $DJANGO
-  - pip install pytest pytest-pep8 pytest-flakes pytest-django
 script:
+  - flake8 --jobs=2 .
   - py.test

@@ -1,5 +1,6 @@
 import pytest
 from measurement import measures
+
 from tests.forms import MeasurementTestForm
 from tests.models import MeasurementTestModel
 
