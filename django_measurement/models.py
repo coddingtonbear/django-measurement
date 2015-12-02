@@ -2,13 +2,12 @@
 from __future__ import absolute_import, unicode_literals
 
 import six
-from measurement import measures
-from measurement.base import BidimensionalMeasure, MeasureBase
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Field
 from django.utils.translation import ugettext_lazy as _
+from measurement import measures
+from measurement.base import BidimensionalMeasure, MeasureBase
 
 from . import forms
 from .utils import get_measurement

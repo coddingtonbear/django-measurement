@@ -1,11 +1,10 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
 from itertools import product
 
-from measurement.base import BidimensionalMeasure, MeasureBase
-
 from django import forms
+from measurement.base import BidimensionalMeasure, MeasureBase
 
 from . import utils
 
