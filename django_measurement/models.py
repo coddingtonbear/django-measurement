@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 import six
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Field
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from measurement import measures
@@ -14,7 +13,8 @@ from . import forms
 from .utils import get_measurement
 
 
-class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
+class MeasurementField(six.with_metaclass(models.SubfieldBase,
+                                          models.FloatField)):
     description = "Easily store, retrieve, and convert python measures."
     empty_strings_allowed = False
     MEASURE_BASES = (
@@ -47,6 +47,7 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
 
         self.measurement = measurement
         self.measurement_class = force_text(measurement.__name__)
+        self.min_value, self.max_value = min_value, max_value
         self.widget_args = {
             'measurement': measurement,
             'unit_choices': unit_choices,
@@ -118,6 +119,54 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
         defaults.update(self.widget_args)
         return super(MeasurementField, self).formfield(**defaults)
 
+    def validate(self, value, model_instance):
+        if not self.editable:
+            # Skip validation for non-editable fields.
+            return
+
+        if self.choices and value not in self.empty_values:
+            for option_key, option_value in self.choices:
+                if isinstance(option_value, (list, tuple)):
+                    # This is an optgroup, so look inside the group for
+                    # options.
+                    for optgroup_key, optgroup_value in option_value:
+                        if value == optgroup_key:
+                            return
+                elif value == option_key:
+                    return
+            raise ValidationError(
+                self.error_messages['invalid_choice'],
+                code='invalid_choice',
+                params={'value': value},
+            )
+
+        if value is None and not self.null:
+            raise ValidationError(
+                self.error_messages['null'], code='null')
+
+        if not self.blank and value in self.empty_values:
+            raise ValidationError(
+                self.error_messages['blank'], code='blank')
+
+        self.min_max_validation(value)
+
+    def min_max_validation(self, value):
+
+        if self.min_value:
+            try:
+                assert value.value >= self.min_value
+            except AssertionError:
+                message = _('Ensure this value is greater than '
+                            'or equal to %(min_value).')
+                raise ValidationError(message)
+
+        if self.max_value:
+            try:
+                assert value.value <= self.max_value
+            except AssertionError:
+                message = _('Ensure this value is less than '
+                            'or equal to %(max_value).')
+                raise ValidationError(message)
 
 # South legacy rules
 try:
