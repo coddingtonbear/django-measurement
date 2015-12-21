@@ -45,8 +45,7 @@ class MeasurementWidget(forms.MultiWidget):
 
 
 class MeasurementField(forms.MultiValueField):
-    def __init__(self, measurement, max_value=None, min_value=None,
-                 unit_choices=None, *args, **kwargs):
+    def __init__(self, measurement, unit_choices=None, *args, **kwargs):
 
         if not issubclass(measurement, (MeasureBase, BidimensionalMeasure)):
             raise ValueError(
@@ -72,7 +71,7 @@ class MeasurementField(forms.MultiValueField):
                     for u in measurement.UNITS
                 ))
 
-        float_field = forms.FloatField(max_value, min_value, *args, **kwargs)
+        float_field = forms.FloatField(*args, **kwargs)
         choice_field = forms.ChoiceField(choices=unit_choices)
         defaults = {
             'widget': MeasurementWidget(

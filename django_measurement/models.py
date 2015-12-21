@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import six
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Field
+from django.db.models import FloatField
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from measurement import measures
@@ -14,7 +14,7 @@ from . import forms
 from .utils import get_measurement
 
 
-class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
+class MeasurementField(six.with_metaclass(models.SubfieldBase, FloatField)):
     description = "Easily store, retrieve, and convert python measures."
     empty_strings_allowed = False
     MEASURE_BASES = (
@@ -29,8 +29,7 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
     }
 
     def __init__(self, verbose_name=None, name=None, measurement=None,
-                 measurement_class=None, unit_choices=None,
-                 min_value=None, max_value=None, *args, **kwargs):
+                 measurement_class=None, unit_choices=None, *args, **kwargs):
 
         if not measurement and measurement_class:
             measurement = getattr(measures, force_text(measurement_class))
@@ -50,8 +49,6 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
         self.widget_args = {
             'measurement': measurement,
             'unit_choices': unit_choices,
-            'max_value': max_value,
-            'min_value': min_value
         }
 
         super(MeasurementField, self).__init__(verbose_name, name,
@@ -61,9 +58,6 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, Field)):
         name, path, args, kwargs = super(MeasurementField, self).deconstruct()
         kwargs['measurement_class'] = self.measurement_class
         return name, path, args, kwargs
-
-    def get_internal_type(self):
-        return 'FloatField'
 
     def get_prep_value(self, value):
         if value is None:
