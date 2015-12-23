@@ -1,8 +1,10 @@
 import pytest
+from django.core.exceptions import ValidationError
 from django.utils import module_loading
 from django.utils.encoding import force_bytes, force_text
 from measurement import measures
 
+from django_measurement.forms import MeasurementField
 from tests.forms import MeasurementTestForm
 from tests.models import MeasurementTestModel
 
@@ -187,6 +189,16 @@ class TestMeasurementFormField(object):
         assert valid_form.is_valid()
         assert not invalid_form.is_valid()
 
+        field = MeasurementField(measures.Distance, max_value=measures.Distance(mi=1))
+        field.clean([0.5, 'mi'])
+        with pytest.raises(ValidationError) as e:
+            field.clean([2.0, 'mi'])
+            assert 'Ensure this value is less than or equal to 1.0 mi.' in force_text(e)
+
+        with pytest.raises(ValueError) as e:
+            MeasurementField(measures.Distance, max_value=1.0)
+            assert force_text(e) == '"max_value" must be a measure, got float'
+
     def test_form_storage(self):
         form = MeasurementTestForm({
             'measurement_distance_0': 2.0,
@@ -206,3 +218,14 @@ class TestMeasurementFormField(object):
         obj = form.save()
 
         assert obj.measurement_speed == measures.Speed(mi__hr=2)
+
+    def test_min_value(self):
+        field = MeasurementField(measures.Distance, min_value=measures.Distance(mi=1.0))
+        field.clean([2.0, 'mi'])
+        with pytest.raises(ValidationError) as e:
+            field.clean([0.5, 'mi'])
+            assert 'Ensure this value is greater than or equal to 1.0 mi.' in force_text(e)
+
+        with pytest.raises(ValueError) as e:
+            MeasurementField(measures.Distance, min_value=1.0)
+            assert force_text(e) == '"min_value" must be a measure, got float'
