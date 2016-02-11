@@ -111,25 +111,3 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, FloatField)):
         defaults.update(kwargs)
         defaults.update(self.widget_args)
         return super(MeasurementField, self).formfield(**defaults)
-
-
-# South legacy rules
-try:
-    from south.modelsinspector import add_introspection_rules
-
-    rules = [
-        (
-            (MeasurementField,),
-            [],
-            {
-                "measurement_class": ["measurement_class", {}],
-            },
-        )
-    ]
-
-    add_introspection_rules(
-        rules,
-        ["^django_measurement\.models\.MeasurementField"]
-    )
-except ImportError:
-    pass
