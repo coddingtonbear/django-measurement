@@ -16,8 +16,13 @@ matrix:
     - env: DJANGO="-e git+https://github.com/django/django.git@master#egg=Django"
 install:
   - pip install --upgrade pip
+  - pip install --upgrade coveralls
   - pip install -r requirements-dev.txt
   - pip install $DJANGO
 script:
+  - isort --check-only --recursive --diff .
   - flake8 --jobs=2 .
-  - py.test
+  - pep257 --verbose --explain --source --count
+  - coverage run --source="django_measurement" -m "pytest"
+after_success:
+  - coveralls
