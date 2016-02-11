@@ -1,9 +1,6 @@
 # -*- coding:utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import six
-from django.core.exceptions import ValidationError
-from django.db import models
 from django.db.models import FloatField
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
@@ -14,7 +11,7 @@ from . import forms
 from .utils import get_measurement
 
 
-class MeasurementField(six.with_metaclass(models.SubfieldBase, FloatField)):
+class MeasurementField(FloatField):
     description = "Easily store, retrieve, and convert python measures."
     empty_strings_allowed = False
     MEASURE_BASES = (
@@ -73,38 +70,23 @@ class MeasurementField(six.with_metaclass(models.SubfieldBase, FloatField)):
         else:
             return super(MeasurementField, self).get_prep_value(value)
 
-    def to_python(self, value):
+    def from_db_value(self, value, expression, connection, context):
         if value is None:
-            return value
+            return None
 
-        elif isinstance(value, self.measurement):
-            return value
+        original_unit = None
+        unit_choices = self.widget_args['unit_choices']
+        if unit_choices:
+            original_unit = unit_choices[0][0]
 
-        elif isinstance(value, self.MEASURE_BASES):
-            raise ValidationError(
-                self.error_messages['invalid_type'],
-                code='invalid_type',
-                params={
-                    'value': value,
-                    'type_wanted': self.measurement.__name__,
-                    'type_given': type(value).__name__
-                },
-            )
+        return get_measurement(
+            measure=self.measurement,
+            value=value,
+            original_unit=original_unit,
+        )
 
-        else:
-            value = super(MeasurementField, self).to_python(value)
-
-            original_unit = None
-
-            unit_choices = self.widget_args['unit_choices']
-            if unit_choices:
-                original_unit = unit_choices[0][0]
-
-            return get_measurement(
-                measure=self.measurement,
-                value=value,
-                original_unit=original_unit,
-            )
+    def to_python(self, value):
+        return value
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.MeasurementField}
