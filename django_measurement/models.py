@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import logging
+
 from django.db.models import FloatField
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
@@ -9,6 +11,8 @@ from measurement.base import BidimensionalMeasure, MeasureBase
 
 from . import forms
 from .utils import get_measurement
+
+logger = logging.getLogger('django_measurement')
 
 
 class MeasurementField(FloatField):
@@ -70,23 +74,40 @@ class MeasurementField(FloatField):
         else:
             return super(MeasurementField, self).get_prep_value(value)
 
+    def get_default_unit(self):
+        unit_choices = self.widget_args['unit_choices']
+        if unit_choices:
+            return unit_choices[0][0]
+        return self.measurement.STANDARD_UNIT
+
     def from_db_value(self, value, expression, connection, context):
         if value is None:
             return None
 
-        original_unit = None
-        unit_choices = self.widget_args['unit_choices']
-        if unit_choices:
-            original_unit = unit_choices[0][0]
-
         return get_measurement(
             measure=self.measurement,
             value=value,
-            original_unit=original_unit,
+            original_unit=self.get_default_unit(),
         )
 
     def to_python(self, value):
-        return value
+        if value is None:
+            return value
+        elif isinstance(value, self.MEASURE_BASES):
+            return value
+        value = super(MeasurementField, self).to_python(value)
+
+        default_unit = self.get_default_unit()
+
+        msg = "You assigned a %s instead of %s, unit was guessed to be \"%s\"." % (
+            type(value).__name__, self.measurement_class, default_unit
+        )
+        logger.warn(msg)
+        return get_measurement(
+            measure=self.measurement,
+            value=value,
+            original_unit=default_unit,
+        )
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.MeasurementField}
