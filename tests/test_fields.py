@@ -229,3 +229,13 @@ class TestMeasurementFormField(object):
         with pytest.raises(ValueError) as e:
             MeasurementField(measures.Distance, min_value=1.0)
             assert force_text(e) == '"min_value" must be a measure, got float'
+
+    def test_float_casting(self, capturelog):
+        m = MeasurementTestModel(measurement_distance=float(2000))
+        m.full_clean()
+
+        record = capturelog.records()[0]
+
+        assert record.levelname == 'WARNING'
+        assert record.message == \
+            'You assigned a float instead of Distance, unit was guessed to be "m".'
