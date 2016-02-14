@@ -1,11 +1,5 @@
 .. image:: https://travis-ci.org/coddingtonbear/django-measurement.png?branch=master
    :target: https://travis-ci.org/coddingtonbear/django-measurement
-.. image:: https://pypip.in/v/django-measurement/badge.png
-  :target: https://crate.io/packages/django-measurement
-.. image:: https://pypip.in/d/django-measurement/badge.png
-  :target: https://crate.io/packages/django-measurement
-.. image:: https://pypip.in/license/django-measurement/badge.png
-  :target: https://pypi.python.org/pypi/django-measurement/
 
 Easily use, manipulate, and store unit-aware measurement objects using Python
 and Django.
