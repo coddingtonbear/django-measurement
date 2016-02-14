@@ -14,5 +14,3 @@ for your custom measure to be properly stored and resurrected.::
     }
 
 You can also override existing measure classes this way.
-Be sure to look at ``django-measurement/measure.py`` for examples of what
-makes a measurement class.

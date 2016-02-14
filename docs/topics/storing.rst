@@ -20,7 +20,7 @@ and assume you had a pint of
 `Ninkasi's Total Domination <http://www.ninkasibrewing.com/beers/total_domination>`_;
 you'd add it to your log like so::
 
-    from django_measurement.measure import Volume
+    from measurement.measures import Volume
 
     beer = BeerConsumptionLogEntry()
     beer.name = 'Total Domination'

@@ -25,7 +25,7 @@ Example use with a model:
 .. code-block:: python
 
    from django_measurement.models import MeasurementField
-   from django_measurement.measure import Volume
+   from measurement.measures import Volume
    from django.db import models
    
    class BeerConsumptionLogEntry(models.Model):
@@ -46,7 +46,7 @@ too:
 
 .. code-block:: python
 
-   >>> from django_measurement.measures import Weight
+   >>> from measurement.measures import Weight
    >>> weight_1 = Weight(lb=125)
    >>> weight_2 = Weight(kg=40)
    >>> added_together = weight_1 + weight_2
