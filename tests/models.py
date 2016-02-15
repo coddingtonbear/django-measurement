@@ -18,8 +18,8 @@ class MeasurementTestModel(models.Model):
         measurement=measures.Distance,
         unit_choices=(('km', 'km'),),
         validators=[
-            MinValueValidator(measures.Distance(1.0)),
-            MaxValueValidator(measures.Distance(3.0))
+            MinValueValidator(measures.Distance(km=1.0)),
+            MaxValueValidator(measures.Distance(km=3.0))
         ],
         blank=True, null=True,
     )
@@ -27,8 +27,8 @@ class MeasurementTestModel(models.Model):
     measurement_weight = MeasurementField(
         measurement=measures.Weight,
         validators=[
-            MinValueValidator(measures.Weight(1.0)),
-            MaxValueValidator(measures.Weight(3.0))
+            MinValueValidator(measures.Weight(kg=1.0)),
+            MaxValueValidator(measures.Weight(kg=3.0))
         ],
         blank=True, null=True,
     )

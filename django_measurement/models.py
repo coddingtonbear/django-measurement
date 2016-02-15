@@ -97,16 +97,16 @@ class MeasurementField(FloatField):
             return value
         value = super(MeasurementField, self).to_python(value)
 
-        default_unit = self.get_default_unit()
+        return_unit = self.get_default_unit()
 
         msg = "You assigned a %s instead of %s, unit was guessed to be \"%s\"." % (
-            type(value).__name__, self.measurement_class, default_unit
+            type(value).__name__, self.measurement_class, return_unit
         )
         logger.warn(msg)
         return get_measurement(
             measure=self.measurement,
             value=value,
-            original_unit=default_unit,
+            unit=return_unit,
         )
 
     def formfield(self, **kwargs):

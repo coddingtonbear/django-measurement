@@ -5,6 +5,7 @@ from django.utils.encoding import force_bytes, force_text
 from measurement import measures
 
 from django_measurement.forms import MeasurementField
+from measurement.measures import Distance
 from tests.forms import MeasurementTestForm
 from tests.models import MeasurementTestModel
 
@@ -231,8 +232,17 @@ class TestMeasurementFormField(object):
             assert force_text(e) == '"min_value" must be a measure, got float'
 
     def test_float_casting(self, capturelog):
-        m = MeasurementTestModel(measurement_distance=float(2000))
+        m = MeasurementTestModel(
+            measurement_distance=float(2000),
+            measurement_distance_km=2,
+        )
         m.full_clean()
+
+        assert m.measurement_distance.value == 2000
+        assert m.measurement_distance.unit == Distance.STANDARD_UNIT
+
+        assert m.measurement_distance_km.value == 2
+        assert m.measurement_distance_km.unit == 'km'
 
         record = capturelog.records()[0]
 

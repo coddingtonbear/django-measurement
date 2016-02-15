@@ -9,7 +9,7 @@ with open('requirements.txt', 'r') as in_:
 
 setup(
     name='django-measurement',
-    version='2.2.1',
+    version='2.2.2',
     url='http://github.com/coddingtonbear/django-measurement/',
     description='Convenient fields and classes for handling measurements',
     author='Adam Coddington',
