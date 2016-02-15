@@ -3,9 +3,9 @@ from django.core.exceptions import ValidationError
 from django.utils import module_loading
 from django.utils.encoding import force_bytes, force_text
 from measurement import measures
+from measurement.measures import Distance
 
 from django_measurement.forms import MeasurementField
-from measurement.measures import Distance
 from tests.forms import MeasurementTestForm
 from tests.models import MeasurementTestModel
 
