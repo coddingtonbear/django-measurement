@@ -243,9 +243,17 @@ class TestMeasurementFormField(object):
 
         assert m.measurement_distance_km.value == 2
         assert m.measurement_distance_km.unit == 'km'
+        assert m.measurement_distance_km == Distance(km=2)
+
+        m.measurement_distance_km = Distance(km=1)
+        m.full_clean()
+        assert m.measurement_distance_km.value == 1
+        assert m.measurement_distance_km.unit == 'km'
+        assert m.measurement_distance_km == Distance(km=1)
 
         record = capturelog.records()[0]
 
         assert record.levelname == 'WARNING'
-        assert record.message == \
-            'You assigned a float instead of Distance, unit was guessed to be "m".'
+        assert record.message == ('You assigned a float instead of Distance to'
+                                  ' tests.models.MeasurementTestModel.measurement_distance,'
+                                  ' unit was guessed to be "m".')

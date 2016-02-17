@@ -99,8 +99,13 @@ class MeasurementField(FloatField):
 
         return_unit = self.get_default_unit()
 
-        msg = "You assigned a %s instead of %s, unit was guessed to be \"%s\"." % (
-            type(value).__name__, self.measurement_class, return_unit
+        msg = "You assigned a %s instead of %s to %s.%s.%s, unit was guessed to be \"%s\"." % (
+            type(value).__name__,
+            self.measurement_class,
+            self.model.__module__,
+            self.model.__name__,
+            self.name,
+            return_unit,
         )
         logger.warn(msg)
         return get_measurement(
