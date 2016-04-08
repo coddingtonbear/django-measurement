@@ -60,17 +60,21 @@ class MeasurementField(forms.MultiValueField):
                 unit_choices = tuple((
                     (
                         '{0}__{1}'.format(primary, reference),
-                        '{0}__{1}'.format(primary, reference),
+                        '{0}__{1}'.format(
+                            getattr(measurement.PRIMARY_DIMENSION, 'LABELS', {}).get(
+                                primary, primary),
+                            getattr(measurement.REFERENCE_DIMENSION, 'LABELS', {}).get(
+                                reference, reference)),
                     )
                     for primary, reference in product(
-                        measurement.PRIMARY_DIMENSION.UNITS,
-                        measurement.REFERENCE_DIMENSION.UNITS,
+                        measurement.PRIMARY_DIMENSION.get_units(),
+                        measurement.REFERENCE_DIMENSION.get_units(),
                     )
                 ))
             else:
                 unit_choices = tuple((
-                    (u, u)
-                    for u in measurement.UNITS
+                    (u, getattr(measurement, 'LABELS', {}).get(u, u))
+                    for u in measurement.get_units()
                 ))
 
         if validators is None:

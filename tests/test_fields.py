@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pytest
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
@@ -6,7 +8,9 @@ from measurement import measures
 from measurement.measures import Distance
 
 from django_measurement.forms import MeasurementField
-from tests.forms import MeasurementTestForm
+from tests.forms import (
+    BiDimensionalLabelTestForm, LabelTestForm, MeasurementTestForm, SITestForm
+)
 from tests.models import MeasurementTestModel
 
 pytestmark = [
@@ -257,3 +261,17 @@ class TestMeasurementFormField(object):
         assert record.message == ('You assigned a float instead of Distance to'
                                   ' tests.models.MeasurementTestModel.measurement_distance,'
                                   ' unit was guessed to be "m".')
+
+    def test_unicode_labels(self):
+        form = LabelTestForm()
+        assert ('c', u'°C') in form.fields['simple'].fields[1].choices
+        assert ('f', u'°F') in form.fields['simple'].fields[1].choices
+        assert ('k', u'°K') in form.fields['simple'].fields[1].choices
+
+        si_form = SITestForm()
+        assert ('ms', 'ms') in si_form.fields['simple'].fields[1].choices
+        assert ('Ps', 'Ps') in si_form.fields['simple'].fields[1].choices
+
+        bi_dim_form = BiDimensionalLabelTestForm()
+        assert ('c__ms', u'°C__ms') in bi_dim_form.fields['simple'].fields[1].choices
+        assert ('c__Ps', u'°C__Ps') in bi_dim_form.fields['simple'].fields[1].choices
