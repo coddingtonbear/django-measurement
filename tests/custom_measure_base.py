@@ -3,11 +3,11 @@
 from sympy import S, Symbol
 from measurement.base import MeasureBase, BidimensionalMeasure
 
-__all__ = [
+__all__ = (
     'Temperature',
     'Time',
     'DegreePerTime',
-]
+)
 
 
 class Temperature(MeasureBase):
