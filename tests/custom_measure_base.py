@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from sympy import S, Symbol
-from measurement.base import MeasureBase, BidimensionalMeasure
+from measurement.base import BidimensionalMeasure, MeasureBase
 
 __all__ = (
     'Temperature',
