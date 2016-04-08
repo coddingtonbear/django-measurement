@@ -9,10 +9,7 @@ from measurement.measures import Distance
 
 from django_measurement.forms import MeasurementField
 from tests.forms import (
-    BiDimensionalLabelTestForm,
-    LabelTestForm, 
-    MeasurementTestForm, 
-    SITestForm,
+    BiDimensionalLabelTestForm, LabelTestForm, MeasurementTestForm, SITestForm
 )
 from tests.models import MeasurementTestModel
 
