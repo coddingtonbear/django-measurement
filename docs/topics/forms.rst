@@ -22,3 +22,21 @@ To limit the value choices of the MeasurementField uses the regular 'choices' ke
             choices=((1.0, 'one'), (2.0, 'two'))
         )
  
+If unicode symbols are needed in the labels for a MeasurementField, define a LABELS dictionary for your subclassed MeasureBase object::
+
+    # -*- coding: utf-8 -*-
+    from sympy import S, Symbol
+    
+    class Temperature(MeasureBase):
+        SU = Symbol('kelvin')
+        STANDARD_UNIT = 'k'
+        UNITS = {
+            'c': SU - S(273.15),
+            'f': (SU - S(273.15)) * S('9/5') + 32,
+            'k': 1.0
+        }
+        LABELS = {
+            'c':u'°C',
+            'f':u'°F',
+            'k':u'°K',
+        }
