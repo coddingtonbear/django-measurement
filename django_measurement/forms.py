@@ -61,22 +61,19 @@ class MeasurementField(forms.MultiValueField):
                     (
                         '{0}__{1}'.format(primary, reference),
                         '{0}__{1}'.format(
-                            getattr(measurement.PRIMARY_DIMENSION,'LABELS',{}).get(primary,primary),
-                            getattr(measurement.REFERENCE_DIMENSION,'LABELS',{}).get(reference,reference)),
+                            getattr(measurement.PRIMARY_DIMENSION, 'LABELS', {}).get(
+                                primary, primary),
+                            getattr(measurement.REFERENCE_DIMENSION, 'LABELS', {}).get(
+                                reference, reference)),
                     )
                     for primary, reference in product(
                         measurement.PRIMARY_DIMENSION.get_units(),
                         measurement.REFERENCE_DIMENSION.get_units(),
                     )
                 ))
-                print list(product(
-                        measurement.PRIMARY_DIMENSION.get_units(),
-                        measurement.REFERENCE_DIMENSION.get_units(),
-                    ))
             else:
-                # TODO: make method for creating unicode labels in MeasureBase and use in BidimensionalMeasure
                 unit_choices = tuple((
-                    (u, getattr(measurement,'LABELS',{}).get(u,u))
+                    (u, getattr(measurement, 'LABELS', {}).get(u, u))
                     for u in measurement.get_units()
                 ))
 
