@@ -6,6 +6,7 @@ Suppose you were trying to cut back on drinking,
 and needed to store a log of how much beer you drink day-to-day;
 you might (naively) create a model like such::
 
+    from measurement.measures import Volume
     from django_measurement.fields import MeasurementField
     from django.db.models import Model
 
