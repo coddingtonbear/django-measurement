@@ -1,1 +1,2 @@
 measurement>=1.6
+django-autocomplete-light>=3.1.5
