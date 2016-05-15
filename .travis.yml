@@ -20,6 +20,7 @@ install:
   - pip install -r requirements-dev.txt
   - pip install $DJANGO
 script:
+  - py.test
   - isort --check-only --recursive --diff .
   - flake8 --jobs=2 .
   - pep257 --verbose --explain --source --count
