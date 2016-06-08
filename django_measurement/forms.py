@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from itertools import product
 
 from django import forms
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from measurement.base import BidimensionalMeasure, MeasureBase
 
@@ -47,8 +48,10 @@ class MeasurementWidget(forms.MultiWidget):
 
 class MeasurementField(forms.MultiValueField):
     def __init__(self, measurement, max_value=None, min_value=None,
-                 unit_choices=None, validators=None, *args, **kwargs):
-
+                 unit_choices=None, validators=None, 
+                 bidimensional_seperator=getattr(settings,'BIDIMENSIONAL_SEPERATOR', '/'),
+                 *args, **kwargs):
+                     
         if not issubclass(measurement, (MeasureBase, BidimensionalMeasure)):
             raise ValueError(
                 "%s must be a subclass of MeasureBase" % measurement
@@ -57,12 +60,16 @@ class MeasurementField(forms.MultiValueField):
         self.measurement_class = measurement
         if not unit_choices:
             if issubclass(measurement, BidimensionalMeasure):
+                assert isinstance(bidimensional_seperator, (unicode, str,)), \
+                    "Supplied bidimensional_seperator for %s must be str or unicode instance;" \
+                    " Instead got type %s" % (measurement, type(bidimensional_seperator),)
                 unit_choices = tuple((
                     (
                         '{0}__{1}'.format(primary, reference),
-                        '{0}__{1}'.format(
+                        '{0}{1}{2}'.format(
                             getattr(measurement.PRIMARY_DIMENSION, 'LABELS', {}).get(
                                 primary, primary),
+                            bidimensional_seperator,
                             getattr(measurement.REFERENCE_DIMENSION, 'LABELS', {}).get(
                                 reference, reference)),
                     )
