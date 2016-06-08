@@ -52,7 +52,7 @@ class MeasurementField(forms.MultiValueField):
                  unit_choices=None, validators=None, 
                  bidimensional_separator=getattr(settings,'BIDIMENSIONAL_SEPARATOR', '/'),
                  *args, **kwargs):
-                     
+
         if not issubclass(measurement, (MeasureBase, BidimensionalMeasure)):
             raise ValueError(
                 "%s must be a subclass of MeasureBase" % measurement
