@@ -50,7 +50,7 @@ class MeasurementWidget(forms.MultiWidget):
 class MeasurementField(forms.MultiValueField):
     def __init__(self, measurement, max_value=None, min_value=None,
                  unit_choices=None, validators=None, 
-                 bidimensional_separator=getattr(settings,'BIDIMENSIONAL_SEPARATOR', '/'),
+                 bidimensional_separator=getattr(settings, 'BIDIMENSIONAL_SEPARATOR', '/'),
                  *args, **kwargs):
 
         if not issubclass(measurement, (MeasureBase, BidimensionalMeasure)):
@@ -63,7 +63,7 @@ class MeasurementField(forms.MultiValueField):
             if issubclass(measurement, BidimensionalMeasure):
                 assert isinstance(bidimensional_separator, string_types), \
                     "Supplied bidimensional_separator for %s must be of string/unicode type;" \
-                    " Instead got type %s" % (measurement, type(bidimensional_separator),)
+                    " Instead got type %s" % (measurement, str(type(bidimensional_separator)),)
                 unit_choices = tuple((
                     (
                         '{0}__{1}'.format(primary, reference),
