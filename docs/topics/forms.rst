@@ -41,7 +41,7 @@ If unicode symbols are needed in the labels for a MeasurementField, define a LAB
             'k':u'°K',
         }
         
-For a `MeasurementField` that represents a `BidimensionalMeasure`, you can set the separator either in settings.py (`BIDIMENSIONAL_SEPARATOR='/'` is default) or override at the kwarg level::
+For a `MeasurementField` that represents a `BidimensionalMeasure`, you can set the separator either in settings.py (`BIDIMENSIONAL_SEPARATOR is '/'` by default, add setting to override for all BiDimensionalMeasure subclasses) or override for an individual field with the kwarg bidimensional_separator::
 
         speed = MeasurementField(
             measurement=Speed,
