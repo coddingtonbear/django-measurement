@@ -49,7 +49,7 @@ class MeasurementWidget(forms.MultiWidget):
 
 class MeasurementField(forms.MultiValueField):
     def __init__(self, measurement, max_value=None, min_value=None,
-                 unit_choices=None, validators=None, 
+                 unit_choices=None, validators=None,
                  bidimensional_separator=getattr(settings, 'BIDIMENSIONAL_SEPARATOR', '/'),
                  *args, **kwargs):
 
