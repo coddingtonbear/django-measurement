@@ -40,3 +40,14 @@ If unicode symbols are needed in the labels for a MeasurementField, define a LAB
             'f':u'°F',
             'k':u'°K',
         }
+        
+For a `MeasurementField` that represents a `BidimensionalMeasure`, you can set the separator either in settings.py (`BIDIMENSIONAL_SEPARATOR=' per '`) or override at the kwarg level. 
+
+        speed = MeasurementField(
+            measurement=Speed,
+            bidimensional_separator=' per '
+        )
+        
+        # Rendered form label will now be in the format "ft per s", "m per hr", etc
+
+
