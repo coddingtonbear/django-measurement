@@ -2,6 +2,7 @@
 Settings
 ========
 
+
 ``MEASURE_OVERRIDES``
 ---------------------
 
@@ -14,3 +15,12 @@ for your custom measure to be properly stored and resurrected.::
     }
 
 You can also override existing measure classes this way.
+
+
+``BIDIMENSIONAL_SEPERATOR``
+---------------------
+For any BidimensionalMeasure, what is placed between the primary and reference dimensions on rendered label
+
+    BIDIMENSIONAL_SEPERATOR = " per "
+
+Defaults to "/". Can be overriden as kwarg `bidimensional_seperator` for a given MeasurementField.
