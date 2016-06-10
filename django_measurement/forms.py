@@ -4,13 +4,12 @@ from __future__ import absolute_import, unicode_literals
 from itertools import product
 
 from django import forms
-from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from measurement.base import BidimensionalMeasure, MeasureBase
 from six import string_types
 
 from . import utils
-from .conf import settings
+from django_measurement.conf import settings
 
 
 class MeasurementWidget(forms.MultiWidget):
@@ -51,7 +50,7 @@ class MeasurementWidget(forms.MultiWidget):
 class MeasurementField(forms.MultiValueField):
     def __init__(self, measurement, max_value=None, min_value=None,
                  unit_choices=None, validators=None,
-                 bidimensional_separator=settings.BIDIMENSIONAL_SEPARATOR,
+                 bidimensional_separator=settings.MEASUREMENT_BIDIMENSIONAL_SEPARATOR,
                  *args, **kwargs):
 
         if not issubclass(measurement, (MeasureBase, BidimensionalMeasure)):

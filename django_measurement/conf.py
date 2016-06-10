@@ -3,7 +3,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from appconf import AppConf
-from django.conf import settings  # NOQA
+from django.conf import settings
 
 __all__ = ('settings', 'DjangoMeasurementConf')
 
@@ -15,3 +15,6 @@ class DjangoMeasurementConf(AppConf):
     """
     For measurement classes subclassing a BidimensionalMeasure, this .
     """
+
+    class Meta:
+        prefix = 'measurement'
