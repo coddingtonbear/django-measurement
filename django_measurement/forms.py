@@ -8,7 +8,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from measurement.base import BidimensionalMeasure, MeasureBase
 from six import string_types
 
-from . import utils
+from django_measurement import utils
 from django_measurement.conf import settings
 
 
