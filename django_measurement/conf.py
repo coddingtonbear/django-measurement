@@ -9,6 +9,7 @@ __all__ = ('settings', 'DjangoMeasurementConf')
 
 
 class DjangoMeasurementConf(AppConf):
+
     """Settings for django-measurement."""
 
     BIDIMENSIONAL_SEPARATOR = '/'
