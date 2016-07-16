@@ -2,15 +2,11 @@
 Settings
 ========
 
-``MEASURE_OVERRIDES``
+
+``MEASUREMENT_BIDIMENSIONAL_SEPARATOR``
 ---------------------
+For any BidimensionalMeasure, what is placed between the primary and reference dimensions on rendered label
 
-If you have your own measures to add, 
-you can specify a name for your measure and a string class path to allow
-for your custom measure to be properly stored and resurrected.::
+    MEASUREMENT_BIDIMENSIONAL_SEPARATOR = " per "
 
-    MEASURE_OVERRIDES = {
-        'IU': 'path.to.my.class.IUMeasure'
-    }
-
-You can also override existing measure classes this way.
+Defaults to "/". Can be overriden as kwarg `bidimensional_separator` for a given MeasurementField.

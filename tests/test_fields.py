@@ -273,5 +273,5 @@ class TestMeasurementFormField(object):
         assert ('Ps', 'Ps') in si_form.fields['simple'].fields[1].choices
 
         bi_dim_form = BiDimensionalLabelTestForm()
-        assert ('c__ms', u'°C__ms') in bi_dim_form.fields['simple'].fields[1].choices
-        assert ('c__Ps', u'°C__Ps') in bi_dim_form.fields['simple'].fields[1].choices
+        assert ('c__ms', u'°C/ms') in bi_dim_form.fields['simple'].fields[1].choices
+        assert ('c__Ps', u'°C/Ps') in bi_dim_form.fields['simple'].fields[1].choices

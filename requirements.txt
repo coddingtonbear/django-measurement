@@ -1,1 +1,2 @@
+django-appconf>=1.0.2
 measurement>=1.6
