@@ -8,14 +8,14 @@ you might (naively) create a model like such::
 
     from measurement.measures import Volume
     from django_measurement.fields import MeasurementField
-    from django.db.models import Model
+    from django.db import models
 
-    class BeerConsumptionLogEntry(Model):
+    class BeerConsumptionLogEntry(models.Model):
         name = models.CharField(max_length=255)
-        volume = models.MeasurementField(Volume)
+        volume = MeasurementField(Volume)
 
         def __str__(self):
-            return '%s of %s' % (self.name, self.volume, )
+            return '%s of %s' % (self.name, self.volume)
 
 and assume you had a pint of 
 `Ninkasi's Total Domination <http://www.ninkasibrewing.com/beers/total_domination>`_;
