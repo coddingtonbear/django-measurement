@@ -19,4 +19,4 @@ pytest-capturelog==0.7
 pytest-django==2.9.1
 pytest==2.8.2
 six==1.10.0               # via measurement
-sympy==0.7.6.1            # via measurement
+sympy==1.0 # via measurement
