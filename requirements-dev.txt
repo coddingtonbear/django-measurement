@@ -11,7 +11,7 @@ isort==4.2.2
 mccabe==0.5.3 # via flake8
 measurement==1.8.0
 pep257==0.7.0
-pep8-naming==0.3.3
+pep8-naming==0.4.1
 pep8==1.7.0               # via flake8
 py==1.4.32 # via pytest, pytest-capturelog
 pyflakes==1.4.0 # via flake8
