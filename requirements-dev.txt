@@ -6,17 +6,17 @@
 #
 -e .
 django-appconf>=1.0.2
-flake8==2.5.0
-isort==4.2.2
-mccabe==0.3.1             # via flake8
+flake8==3.2.1
+isort==4.2.5
+mccabe==0.5.3 # via flake8
 measurement==1.8.0
-pep257==0.6.0
-pep8-naming==0.3.3
+pydocstyle==1.1.1
+pep8-naming==0.4.1
 pep8==1.7.0               # via flake8
-py==1.4.30                # via pytest, pytest-capturelog
-pyflakes==1.0.0           # via flake8
+py==1.4.32 # via pytest, pytest-capturelog
+pyflakes==1.4.0 # via flake8
 pytest-capturelog==0.7
-pytest-django==2.9.1
-pytest==2.8.2
+pytest-django==3.1.2
+pytest==3.0.5
 six==1.10.0               # via measurement
-sympy==0.7.6.1            # via measurement
+sympy==1.0 # via measurement
