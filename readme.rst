@@ -24,7 +24,7 @@ Example use with a model:
    
    class BeerConsumptionLogEntry(models.Model):
        name = models.CharField(max_length=255)
-       volume = MeasurementField(Volume)
+       volume = MeasurementField(measurement=Volume)
    
        def __unicode__(self):
            return u"%s of %s" % (self.name, self.volume)
