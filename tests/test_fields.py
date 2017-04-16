@@ -59,6 +59,26 @@ class TestMeasurementField(object):
 
         assert retrieved.measurement_weight == measures.Weight(g=21.4)
 
+    def test_min_validation_of_measurement_field(self):
+        measurement = measures.Weight(g=-2.0)
+
+        with pytest.raises(ValidationError):
+            instance = MeasurementTestModel()
+            instance.min_value = measures.Weight(g=0.0)
+            instance.save()
+            instance.measurement_weight = measurement
+            instance.full_clean()
+
+    def test_max_validation_of_measurement_field(self):
+        measurement = measures.Weight(g=10.0)
+
+        with pytest.raises(ValidationError):
+            instance = MeasurementTestModel()
+            instance.max_value = 5.0
+            instance.save()
+            instance.measurement_weight = measurement
+            instance.full_clean()
+
     def test_storage_of_bidimensional_measurement(self):
         measurement = measures.Speed(mph=20)
 
