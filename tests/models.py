@@ -1,8 +1,57 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils.translation import ugettext as _
+from django.utils.encoding import python_2_unicode_compatible
+
 from measurement import measures
 
 from django_measurement.models import MeasurementField
+
+
+@python_2_unicode_compatible
+class Product(models.Model):
+    """
+    Product model.
+    """
+    name = models.CharField(
+        _('name'),
+        help_text=_('Name of the product.'),
+        max_length=255,
+        blank=False,
+        null=False
+    )
+    weight = MeasurementField(
+        _('gross weight'),
+        measurement=measures.Weight,
+        unit_choices=(('kg', 'kg'),),
+    )
+    volume = MeasurementField(
+        _('volume'),
+        measurement=measures.Volume,
+        unit_choices=(('cubic_meter', _('cubic meter')),),
+    )
+    width = MeasurementField(
+        _('width'),
+        measurement=measures.Distance,
+        unit_choices=(('centimeter', _('centimeter')),),
+    )
+    height = MeasurementField(
+        _('height'),
+        measurement=measures.Distance,
+        unit_choices=(('centimeter', _('centimeter')),),
+    )
+    depth = MeasurementField(
+        _('depth'),
+        measurement=measures.Distance,
+        unit_choices=(('centimeter', _('centimeter')),),
+    )
+
+    class Meta:
+        verbose_name = _('product')
+        verbose_name_plural = _('products')
+
+    def __str__(self):
+        return self.name
 
 
 class MeasurementTestModel(models.Model):
