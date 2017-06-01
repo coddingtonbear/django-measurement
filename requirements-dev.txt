@@ -7,7 +7,7 @@
 -e .
 django-appconf>=1.0.2
 flake8==3.3.0
-isort==4.2.5
+isort==4.2.8
 mccabe==0.6.1 # via flake8
 measurement==1.8.0
 pydocstyle==2.0.0
