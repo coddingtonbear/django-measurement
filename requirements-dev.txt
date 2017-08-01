@@ -17,6 +17,6 @@ py==1.4.34 # via pytest, pytest-capturelog
 pyflakes==1.5.0 # via flake8
 pytest-capturelog==0.7
 pytest-django==3.1.2
-pytest==3.1.3
+pytest==3.2.0
 six==1.10.0               # via measurement
 sympy==1.1.1 # via measurement
