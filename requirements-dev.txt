@@ -14,7 +14,7 @@ pydocstyle==2.0.0
 pep8-naming==0.4.1
 pep8==1.7.0               # via flake8
 py==1.4.34 # via pytest, pytest-capturelog
-pyflakes==1.5.0 # via flake8
+pyflakes==1.6.0 # via flake8
 pytest-capturelog==0.7
 pytest-django==3.1.2
 pytest==3.2.0
