@@ -12,7 +12,7 @@ mccabe==0.6.1 # via flake8
 measurement==1.8.0
 pydocstyle==2.1.1
 pep8-naming==0.4.1
-pep8==1.7.0               # via flake8
+pep8==1.7.1               # via flake8
 py==1.4.34 # via pytest, pytest-capturelog
 pyflakes==1.6.0 # via flake8
 pytest-capturelog==0.7
