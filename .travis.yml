@@ -1,29 +1,37 @@
 language: python
 sudo: false
-cache:
-  - pip
-python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
+cache: pip
+python: 3.6
 env:
   matrix:
-    - DJANGO="Django<1.9,>=1.8"
-    - DJANGO="Django<1.10,>=1.9"
-    - DJANGO="Django<1.11,>=1.10"
-    - DJANGO="https://github.com/django/django/archive/master.tar.gz#egg=django"
+  - DJANGO=111
+  - DJANGO=20
+  - DJANGO=master
+  - TOXENV=qa
 matrix:
+  fast_finish: true
   allow_failures:
-    - env: DJANGO="https://github.com/django/django/archive/master.tar.gz#egg=django"
+  - env: DJANGO=master
 install:
-  - pip install --upgrade pip
-  - pip install --upgrade coveralls
-  - pip install -r requirements-dev.txt
-  - pip install $DJANGO
+- pip install --upgrade pip tox
+- pip install -U codecov
+before_script:
+- |
+  if [[ -z $TOXENV ]]; then
+    export TOXENV=py$(echo $TRAVIS_PYTHON_VERSION | sed -e 's/\.//g')-dj$DJANGO
+  fi
+- echo $TOXENV
 script:
-  - isort --check-only --recursive --diff .
-  - flake8 --jobs=2 .
-  - pydocstyle --verbose --explain --source --count
-  - coverage run --source="django_measurement" -m "pytest"
+- tox -e $TOXENV
 after_success:
-  - coveralls
+- codecov
+deploy:
+  provider: pypi
+  user: codingjoe
+  password:
+    secure: a5tlCZBkW+ZaTq0ZAJX5nrucGbzV3TCPxY5wWBTrcFDynGVhSEkN/xG3obxi9dNxRP3Y/iTDZp+CUJraUxHehbsFZ7vtRWXWOnhWeJrlVrc0/KPmMWpHOAbTZ/UIZZfn8q362HAb8c6BcrAWOK00Bpt3DBIzzGXvsg2sdcrpW4k=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: coddingtonbear/django-measurement
+    branch: master

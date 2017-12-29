@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
-from django.utils.encoding import force_bytes, force_text
 from measurement import measures
 from measurement.measures import Distance
 
@@ -18,7 +15,7 @@ pytestmark = [
 ]
 
 
-class TestMeasurementField(object):
+class TestMeasurementField:
     def test_storage_of_standard_measurement(self):
         measurement = measures.Weight(g=20)
 
@@ -137,7 +134,7 @@ class TestMeasurementField(object):
     ('measurement_temperature', measures.Temperature),
     ('measurement_speed_mph', measures.Speed),
 ])
-class TestDeconstruct(object):
+class TestDeconstruct:
     def test_deconstruct(self, fieldname, measure_cls):
         field = MeasurementTestModel._meta.get_field(fieldname)
 
@@ -159,29 +156,8 @@ class TestDeconstruct(object):
             name, path, args, kwargs
         )
 
-    def test_deconstruct_old_migrations(self, fieldname, measure_cls):
-        field = MeasurementTestModel._meta.get_field(fieldname)
 
-        name, path, args, kwargs = field.deconstruct()
-
-        # replace str class with binary
-        kwargs['measurement_class'] = force_bytes(kwargs['measurement_class'])
-
-        new_cls = module_loading.import_string(path)
-        new_field = new_cls(name=name, *args, **kwargs)
-
-        assert type(field) == type(new_field)
-
-        _, _, _, kwargs_new = field.deconstruct()
-
-        # kwargs get corrected, cls is a str again
-        assert (
-            kwargs_new['measurement_class'] ==
-            force_text(kwargs['measurement_class'])
-        )
-
-
-class TestMeasurementFormField(object):
+class TestMeasurementFormField:
     def test_max_value(self):
         valid_form = MeasurementTestForm({
             'measurement_distance_0': 2.0,
@@ -198,11 +174,11 @@ class TestMeasurementFormField(object):
         field.clean([0.5, 'mi'])
         with pytest.raises(ValidationError) as e:
             field.clean([2.0, 'mi'])
-            assert 'Ensure this value is less than or equal to 1.0 mi.' in force_text(e)
+            assert 'Ensure this value is less than or equal to 1.0 mi.' in str(e)
 
         with pytest.raises(ValueError) as e:
             MeasurementField(measures.Distance, max_value=1.0)
-            assert force_text(e) == '"max_value" must be a measure, got float'
+            assert bytes(e) == '"max_value" must be a measure, got float'
 
     def test_form_storage(self):
         form = MeasurementTestForm({
@@ -229,13 +205,13 @@ class TestMeasurementFormField(object):
         field.clean([2.0, 'mi'])
         with pytest.raises(ValidationError) as e:
             field.clean([0.5, 'mi'])
-            assert 'Ensure this value is greater than or equal to 1.0 mi.' in force_text(e)
+            assert 'Ensure this value is greater than or equal to 1.0 mi.' in str(e)
 
         with pytest.raises(ValueError) as e:
             MeasurementField(measures.Distance, min_value=1.0)
-            assert force_text(e) == '"min_value" must be a measure, got float'
+            assert str(e) == '"min_value" must be a measure, got float'
 
-    def test_float_casting(self, capturelog):
+    def test_float_casting(self, caplog):
         m = MeasurementTestModel(
             measurement_distance=float(2000),
             measurement_distance_km=2,
@@ -255,7 +231,7 @@ class TestMeasurementFormField(object):
         assert m.measurement_distance_km.unit == 'km'
         assert m.measurement_distance_km == Distance(km=1)
 
-        record = capturelog.records()[0]
+        record = caplog.records[0]
 
         assert record.levelname == 'WARNING'
         assert record.message == ('You assigned a float instead of Distance to'

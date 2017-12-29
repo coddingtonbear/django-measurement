@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -14,8 +11,6 @@ INSTALLED_APPS = (
     'django_measurement',
     'tests'
 )
-
-MIDDLEWARE_CLASSES = []
 
 SITE_ID = 1
 ROOT_URLCONF = 'core.urls'

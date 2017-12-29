@@ -1,10 +1,10 @@
-.. image:: https://travis-ci.org/coddingtonbear/django-measurement.png?branch=master
-   :target: https://travis-ci.org/coddingtonbear/django-measurement
+|version| |ci| |coverage| |license|
+
+Django Measurement
+==================
 
 Easily use, manipulate, and store unit-aware measurement objects using Python
 and Django.
-
-**Note**: Version 2.0 has no backward compatibility due to major design changes.
 
 `django.contrib.gis.measure <https://github.com/django/django/blob/master/django/contrib/gis/measure.py>`_
 has these wonderful 'Distance' objects that can be used not only for storing a
@@ -12,7 +12,7 @@ unit-aware distance measurement, but also for converting between different
 units and adding/subtracting these objects from one another.
 
 This module provides for a django model field and admin interface for storing
-any measurements provided by `python-measurement <https://github.com/coddingtonbear/python-measurement>`_.
+any measurements provided by `python-measurement`_.
 
 Example use with a model:
 
@@ -35,7 +35,7 @@ Example use with a model:
    entry.save()
 
 These stored measurement objects can be used in all of the usual ways supported
-by `python-measurement <https://github.com/coddingtonbear/python-measurement>`_
+by `python-measurement`_
 too:
 
 .. code-block:: python
@@ -49,10 +49,18 @@ too:
    >>> added_together.kg  # Maybe I actually need this value in kg?
    96.699
 
-- Documentation for django-measurement is available an
-  `ReadTheDocs <http://django-measurement.readthedocs.org/>`_.
-- Please post issues on
-  `Github <http://github.com/coddingtonbear/django-measurement/issues>`_.
-- Test status available on
-  `Travis-CI <https://travis-ci.org/coddingtonbear/django-measurement>`_.
+- Documentation for django-measurement is available via `Read the Docs`_.
+- Please post issues on GitHub_.
 
+.. _Read the Docs: https://django-measurement.readthedocs.io/
+.. _GitHub: https://github.com/coddingtonbear/django-measurement/issues
+.. _python-measurement: https://github.com/coddingtonbear/python-measurement
+
+.. |version| image:: https://img.shields.io/pypi/v/django-measurement.svg
+    :target: https://pypi.python.org/pypi/django-measurement
+.. |ci| image:: https://api.travis-ci.org/coddingtonbear/django-measurement.svg?branch=master
+    :target: https://travis-ci.org/coddingtonbear/django-measurement
+.. |coverage| image:: https://codecov.io/gh/coddingtonbear/django-measurement/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/coddingtonbear/django-measurement
+.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg
+    :target: LICENSE

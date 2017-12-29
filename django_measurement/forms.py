@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 from itertools import product
 
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 from measurement.base import BidimensionalMeasure, MeasureBase
-from six import string_types
 
 from django_measurement import utils
 from django_measurement.conf import settings
@@ -61,7 +57,7 @@ class MeasurementField(forms.MultiValueField):
         self.measurement_class = measurement
         if not unit_choices:
             if issubclass(measurement, BidimensionalMeasure):
-                assert isinstance(bidimensional_separator, string_types), \
+                assert isinstance(bidimensional_separator, str), \
                     "Supplied bidimensional_separator for %s must be of string/unicode type;" \
                     " Instead got type %s" % (measurement, str(type(bidimensional_separator)),)
                 unit_choices = tuple((

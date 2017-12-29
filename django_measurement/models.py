@@ -1,10 +1,6 @@
-# -*- coding:utf-8 -*-
-from __future__ import absolute_import, unicode_literals
-
 import logging
 
 from django.db.models import FloatField
-from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from measurement import measures
 from measurement.base import BidimensionalMeasure, MeasureBase
@@ -32,8 +28,8 @@ class MeasurementField(FloatField):
     def __init__(self, verbose_name=None, name=None, measurement=None,
                  measurement_class=None, unit_choices=None, *args, **kwargs):
 
-        if not measurement and measurement_class:
-            measurement = getattr(measures, force_text(measurement_class))
+        if not measurement and measurement_class is not None:
+            measurement = getattr(measures, measurement_class)
 
         if not measurement:
             raise TypeError('MeasurementField() takes a measurement'
@@ -46,7 +42,7 @@ class MeasurementField(FloatField):
             )
 
         self.measurement = measurement
-        self.measurement_class = force_text(measurement.__name__)
+        self.measurement_class = str(measurement.__name__)
         self.widget_args = {
             'measurement': measurement,
             'unit_choices': unit_choices,
