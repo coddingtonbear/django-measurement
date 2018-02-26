@@ -3,6 +3,7 @@ from django.db import models
 from measurement import measures
 
 from django_measurement.models import MeasurementField
+from tests.custom_measure_base import DegreePerTime, Temperature, Time
 
 
 class MeasurementTestModel(models.Model):
@@ -43,7 +44,7 @@ class MeasurementTestModel(models.Model):
     )
 
     measurement_temperature = MeasurementField(
-        measurement=measures.Temperature,
+        measurement_class='Temperature',
         validators=[
             MinValueValidator(measures.Temperature(1.0)),
             MaxValueValidator(measures.Temperature(3.0))
@@ -58,6 +59,21 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Speed(mph=1.0)),
             MaxValueValidator(measures.Speed(mph=3.0))
         ],
+        blank=True, null=True,
+    )
+
+    measurement_custom_degree_per_time = MeasurementField(
+        measurement=DegreePerTime,
+        blank=True, null=True,
+    )
+
+    measurement_custom_temperature = MeasurementField(
+        measurement=Temperature,
+        blank=True, null=True,
+    )
+
+    measurement_custom_time = MeasurementField(
+        measurement=Time,
         blank=True, null=True,
     )
 

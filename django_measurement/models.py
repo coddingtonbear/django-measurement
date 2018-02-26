@@ -42,7 +42,7 @@ class MeasurementField(FloatField):
             )
 
         self.measurement = measurement
-        self.measurement_class = str(measurement.__name__)
+        self.measurement_class = measurement_class
         self.widget_args = {
             'measurement': measurement,
             'unit_choices': unit_choices,
@@ -53,7 +53,10 @@ class MeasurementField(FloatField):
 
     def deconstruct(self):
         name, path, args, kwargs = super(MeasurementField, self).deconstruct()
-        kwargs['measurement_class'] = self.measurement_class
+        if self.measurement_class:
+            kwargs['measurement_class'] = self.measurement_class
+        else:
+            kwargs['measurement'] = self.measurement
         return name, path, args, kwargs
 
     def get_prep_value(self, value):
@@ -97,7 +100,7 @@ class MeasurementField(FloatField):
 
         msg = "You assigned a %s instead of %s to %s.%s.%s, unit was guessed to be \"%s\"." % (
             type(value).__name__,
-            self.measurement_class,
+            self.measurement_class or str(self.measurement.__name__),
             self.model.__module__,
             self.model.__name__,
             self.name,
