@@ -8,6 +8,7 @@ env:
   - DJANGO=20
   - DJANGO=master
   - TOXENV=qa
+  - TOXENV=docs
 matrix:
   fast_finish: true
   allow_failures:
