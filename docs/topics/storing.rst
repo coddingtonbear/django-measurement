@@ -6,15 +6,15 @@ Suppose you were trying to cut back on drinking,
 and needed to store a log of how much beer you drink day-to-day;
 you might (naively) create a model like such::
 
+    from django_measurement.models import MeasurementField
     from measurement.measures import Volume
-    from django_measurement.fields import MeasurementField
     from django.db import models
 
     class BeerConsumptionLogEntry(models.Model):
         name = models.CharField(max_length=255)
-        volume = MeasurementField(Volume)
+        volume = MeasurementField(measurement=Volume)
 
-        def __str__(self):
+        def __unicode__(self):
             return '%s of %s' % (self.name, self.volume)
 
 and assume you had a pint of 
