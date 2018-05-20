@@ -14,7 +14,7 @@ you might (naively) create a model like such::
         name = models.CharField(max_length=255)
         volume = MeasurementField(measurement=Volume)
 
-        def __unicode__(self):
+        def __str__(self):
             return '%s of %s' % (self.name, self.volume)
 
 and assume you had a pint of 
