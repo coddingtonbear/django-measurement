@@ -62,8 +62,8 @@ class MeasurementField(forms.MultiValueField):
                     " Instead got type %s" % (measurement, str(type(bidimensional_separator)),)
                 unit_choices = tuple((
                     (
-                        u'{0}__{1}'.format(primary, reference),
-                        u'{0}{1}{2}'.format(
+                        '{0}__{1}'.format(primary, reference),
+                        '{0}{1}{2}'.format(
                             getattr(measurement.PRIMARY_DIMENSION, 'LABELS', {}).get(
                                 primary, primary),
                             bidimensional_separator,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from measurement.base import BidimensionalMeasure, MeasureBase
 from sympy import S, Symbol
 
