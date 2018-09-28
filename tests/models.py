@@ -44,6 +44,15 @@ class MeasurementTestModel(models.Model):
     )
 
     measurement_temperature = MeasurementField(
+        measurement=measures.Temperature,
+        validators=[
+            MinValueValidator(measures.Temperature(1.0)),
+            MaxValueValidator(measures.Temperature(3.0))
+        ],
+        blank=True, null=True,
+    )
+
+    measurement_temperature2 = MeasurementField(
         measurement_class='Temperature',
         validators=[
             MinValueValidator(measures.Temperature(1.0)),
