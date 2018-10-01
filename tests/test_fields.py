@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytest
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
@@ -5,6 +6,7 @@ from measurement import measures
 from measurement.measures import Distance
 
 from django_measurement.forms import MeasurementField
+from tests.custom_measure_base import DegreePerTime, Temperature, Time
 from tests.forms import (
     BiDimensionalLabelTestForm, LabelTestForm, MeasurementTestForm, SITestForm
 )
@@ -133,6 +135,9 @@ class TestMeasurementField:
     ('measurement_speed', measures.Speed),
     ('measurement_temperature', measures.Temperature),
     ('measurement_speed_mph', measures.Speed),
+    ('measurement_custom_degree_per_time', DegreePerTime),
+    ('measurement_custom_temperature', Temperature),
+    ('measurement_custom_time', Time),
 ])
 class TestDeconstruct:
     def test_deconstruct(self, fieldname, measure_cls):
@@ -145,8 +150,11 @@ class TestDeconstruct:
         assert args == []
         assert kwargs['blank'] == field.blank
         assert kwargs['null'] == field.null
-        assert kwargs['measurement_class'] == measure_cls.__name__
-        assert kwargs['measurement_class'] == field.measurement_class
+        if 'measurement_class' in kwargs:
+            assert kwargs['measurement_class'] == measure_cls.__name__
+            assert kwargs['measurement_class'] == field.measurement_class
+        else:
+            assert 'measurement' in kwargs
 
         new_cls = module_loading.import_string(path)
         new_field = new_cls(name=name, *args, **kwargs)
