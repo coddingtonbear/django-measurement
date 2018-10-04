@@ -107,7 +107,7 @@ class MeasurementField(FloatField):
             self.name,
             return_unit,
         )
-        logger.warn(msg)
+        logger.warning(msg)
         return get_measurement(
             measure=self.measurement,
             value=value,
