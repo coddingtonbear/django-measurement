@@ -80,7 +80,7 @@ class MeasurementField(FloatField):
             return unit_choices[0][0]
         return self.measurement.STANDARD_UNIT
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, *args, **kwargs):
         if value is None:
             return None
 
