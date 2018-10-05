@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
@@ -150,11 +149,7 @@ class TestDeconstruct:
         assert args == []
         assert kwargs['blank'] == field.blank
         assert kwargs['null'] == field.null
-        if 'measurement_class' in kwargs:
-            assert kwargs['measurement_class'] == measure_cls.__name__
-            assert kwargs['measurement_class'] == field.measurement_class
-        else:
-            assert 'measurement' in kwargs
+        assert kwargs['measurement'] == field.measurement
 
         new_cls = module_loading.import_string(path)
         new_field = new_cls(name=name, *args, **kwargs)
