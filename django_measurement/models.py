@@ -90,11 +90,30 @@ class MeasurementField(FloatField):
             original_unit=self.get_default_unit(),
         )
 
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        if not isinstance(value, self.MEASURE_BASES):
+            return value
+        return '%s:%s' % (value.value, value.unit)
+
+    def deserialize_value_from_string(self, s: str):
+        parts = s.split(':', 1)
+        if len(parts) != 2:
+            return None
+        value, unit = float(parts[0]), parts[1]
+        measure = get_measurement(self.measurement, value=value, unit=unit)
+        return measure
+
     def to_python(self, value):
+
         if value is None:
             return value
         elif isinstance(value, self.MEASURE_BASES):
             return value
+        elif isinstance(value, str):
+            parsed = self.deserialize_value_from_string(value)
+            if parsed is not None:
+                return parsed
         value = super(MeasurementField, self).to_python(value)
 
         return_unit = self.get_default_unit()

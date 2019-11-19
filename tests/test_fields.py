@@ -1,4 +1,5 @@
 import pytest
+from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
 from measurement import measures
@@ -158,6 +159,26 @@ class TestDeconstruct:
         assert field.deconstruct() == (
             name, path, args, kwargs
         )
+
+
+@pytest.mark.parametrize('fieldname, measure, expected_serialized_value', [
+    ('measurement_weight', measures.Weight(kg=4.0), "4.0:kg"),
+    ('measurement_speed', measures.Speed(mi__hr=2.0), "2.0:mi__hr"),
+])
+class TestSerialization:
+    def test_deconstruct(self, fieldname, measure, expected_serialized_value):
+        instance = MeasurementTestModel(pk=0)
+        setattr(instance, fieldname, measure)
+        serialized_object = serializers.serialize("python", [instance])[0]
+        serialized_value = serialized_object["fields"][fieldname]
+
+        assert isinstance(serialized_value, str)
+        assert serialized_value == expected_serialized_value
+
+        deserialized_obj = next(serializers.deserialize("python", [serialized_object]))
+        deserialized_value = getattr(deserialized_obj.object, fieldname)
+
+        assert deserialized_value == measure
 
 
 class TestMeasurementFormField:
