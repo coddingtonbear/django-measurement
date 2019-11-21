@@ -1,16 +1,21 @@
+dist: xenial
 language: python
 sudo: false
 cache: pip
-python: 3.6
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
 env:
   matrix:
   - DJANGO=111
-  - DJANGO=20
+  - DJANGO=22
   - DJANGO=master
-  - TOXENV=qa
-  - TOXENV=docs
 matrix:
   fast_finish: true
+  include:
+    - env: TOXENV=qa
+    - env: TOXENV=docs
   allow_failures:
   - env: DJANGO=master
 install:
