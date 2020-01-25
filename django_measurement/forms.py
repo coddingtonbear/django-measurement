@@ -2,10 +2,11 @@ from itertools import product
 
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
+
 from measurement.base import BidimensionalMeasure, MeasureBase
 
-from django_measurement import utils
-from django_measurement.conf import settings
+from . import utils
+from .conf import settings
 
 
 class MeasurementWidget(forms.MultiWidget):
@@ -24,7 +25,7 @@ class MeasurementWidget(forms.MultiWidget):
             )
 
         widgets = (float_widget, unit_choices_widget)
-        super(MeasurementWidget, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value:
@@ -45,7 +46,8 @@ class MeasurementWidget(forms.MultiWidget):
 
 class MeasurementField(forms.MultiValueField):
     def __init__(self, measurement, max_value=None, min_value=None,
-                 unit_choices=None, validators=None,
+                 unit_choices=None, validators=None, decimal=False,
+                 max_digits=None, decimal_places=None,
                  bidimensional_separator=settings.MEASUREMENT_BIDIMENSIONAL_SEPARATOR,
                  *args, **kwargs):
 
@@ -96,18 +98,26 @@ class MeasurementField(forms.MultiValueField):
                 raise ValueError(msg)
             validators += [MaxValueValidator(max_value)]
 
-        float_field = forms.FloatField(*args, **kwargs)
+        if decimal:
+            if max_digits is not None and decimal_places is not None:
+                number_field = forms.DecimalField(max_digits=max_digits, decimal_places=decimal_places, *args, **kwargs)
+            else:
+                msg = 'Must specify both max_digits and decimal_places when using decimals'
+                raise ValueError(msg)
+        else:
+            number_field = forms.FloatField(*args, **kwargs)
+
         choice_field = forms.ChoiceField(choices=unit_choices)
         defaults = {
             'widget': MeasurementWidget(
-                float_widget=float_field.widget,
+                float_widget=number_field.widget,
                 unit_choices_widget=choice_field.widget,
                 unit_choices=unit_choices
             ),
         }
         defaults.update(kwargs)
-        fields = (float_field, choice_field)
-        super(MeasurementField, self).__init__(fields, validators=validators,
+        fields = (number_field, choice_field)
+        super().__init__(fields, validators=validators,
                                                *args, **defaults)
 
     def compress(self, data_list):
