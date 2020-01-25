@@ -7,11 +7,10 @@ from django.db.backends import utils
 from django.db.models import DecimalField, Field, FloatField
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-
-from django_measurement import forms
-from django_measurement.utils import get_measurement
 from measurement import measures
 from measurement.base import BidimensionalMeasure, MeasureBase
+from django_measurement import forms
+from django_measurement.utils import get_measurement
 
 logger = logging.getLogger('django_measurement')
 

@@ -1,7 +1,6 @@
 """Settings for django-measurement."""
-from django.conf import settings
-
 from appconf import AppConf
+from django.conf import settings
 
 __all__ = ('settings',)
 
