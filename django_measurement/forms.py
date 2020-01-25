@@ -5,8 +5,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 from measurement.base import BidimensionalMeasure, MeasureBase
 
-from . import utils
-from .conf import settings
+from django_measurement. import utils
+from django_measurement.conf import settings
 
 
 class MeasurementWidget(forms.MultiWidget):

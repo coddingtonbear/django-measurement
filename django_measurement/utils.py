@@ -1,5 +1,3 @@
-#from measurement.base import BidimensionalMeasure
-
 from measurement.base import BidimensionalMeasure
 
 
