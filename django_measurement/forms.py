@@ -43,6 +43,19 @@ class MeasurementWidget(forms.MultiWidget):
         return [None, None]
 
 
+def get_number_field(decimal, max_digits, decimal_places, *args, **kwargs):
+    if not decimal:
+        return forms.FloatField(*args, **kwargs)
+    else:
+        if max_digits is not None and decimal_places is not None:
+            return forms.DecimalField(max_digits=max_digits,
+                                      decimal_places=decimal_places,
+                                      *args, **kwargs)
+        else:
+            msg = 'Must specify both max_digits and decimal_places when using decimals'
+            raise ValueError(msg)
+
+
 class MeasurementField(forms.MultiValueField):
     def __init__(self, measurement, max_value=None, min_value=None,
                  unit_choices=None, validators=None, decimal=False,
@@ -97,14 +110,7 @@ class MeasurementField(forms.MultiValueField):
                 raise ValueError(msg)
             validators += [MaxValueValidator(max_value)]
 
-        if decimal:
-            if max_digits is not None and decimal_places is not None:
-                number_field = forms.DecimalField(max_digits=max_digits, decimal_places=decimal_places, *args, **kwargs)
-            else:
-                msg = 'Must specify both max_digits and decimal_places when using decimals'
-                raise ValueError(msg)
-        else:
-            number_field = forms.FloatField(*args, **kwargs)
+        number_field = get_number_field(decimal, max_digits, decimal_places, *args, **kwargs)
 
         choice_field = forms.ChoiceField(choices=unit_choices)
         defaults = {
@@ -116,8 +122,7 @@ class MeasurementField(forms.MultiValueField):
         }
         defaults.update(kwargs)
         fields = (number_field, choice_field)
-        super().__init__(fields, validators=validators,
-                                               *args, **defaults)
+        super().__init__(fields, validators=validators, *args, **defaults)
 
     def compress(self, data_list):
         if not data_list:

@@ -2,9 +2,8 @@ import decimal as decimal_class
 import logging
 import warnings
 
-from django.core import checks, validators
-from django.db.backends import utils
-from django.db.models import DecimalField, Field, FloatField
+from django.core import checks
+from django.db.models import Field, FloatField
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from measurement import measures
@@ -60,7 +59,7 @@ class MeasurementDecimalField(Field):
             'max_digits': max_digits,
             'decimal_places': decimal_places,
         }
-        
+
         super().__init__(verbose_name, name, *args, **kwargs)
 
     def deconstruct(self):
@@ -120,7 +119,6 @@ class MeasurementDecimalField(Field):
         return measure
 
     def to_python(self, value):
-
         if value is None:
             return value
         elif isinstance(value, self.MEASURE_BASES):
@@ -150,7 +148,8 @@ class MeasurementDecimalField(Field):
         )
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.MeasurementField, 'max_digits': self.max_digits, 'decimal_places': self.decimal_places,}
+        defaults = {'form_class': forms.MeasurementField, 'max_digits': self.max_digits,
+                    'decimal_places': self.decimal_places}
         defaults.update(kwargs)
         defaults.update(self.widget_args)
         return super().formfield(**defaults)
@@ -160,7 +159,7 @@ class MeasurementDecimalField(Field):
 
     @cached_property
     def context(self):
-        return decimal_class.Context(prec=self.max_digits)    
+        return decimal_class.Context(prec=self.max_digits)
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)
@@ -327,7 +326,6 @@ class MeasurementFloatField(FloatField):
         return measure
 
     def to_python(self, value):
-
         if value is None:
             return value
         elif isinstance(value, self.MEASURE_BASES):
@@ -361,16 +359,20 @@ class MeasurementFloatField(FloatField):
         defaults.update(self.widget_args)
         return super().formfield(**defaults)
 
-class MeasurementField(object):
-    def __new__(self, verbose_name=None, name=None, measurement=None,
-                 measurement_class=None, unit_choices=None, decimal=False,
-                 max_digits=None, decimal_places=None, *args, **kwargs):
 
+class MeasurementField(object):
+    def __new__(cls, verbose_name=None, name=None, measurement=None,
+                measurement_class=None, unit_choices=None, decimal=False,
+                max_digits=None, decimal_places=None, *args, **kwargs):
 
         if decimal:
-            return MeasurementDecimalField(verbose_name=verbose_name, name=name, measurement=measurement,
-                 measurement_class=measurement_class, unit_choices=unit_choices, 
-                 max_digits=max_digits, decimal_places=decimal_places, *args, **kwargs)
+            return MeasurementDecimalField(verbose_name=verbose_name, name=name,
+                                           measurement=measurement,
+                                           measurement_class=measurement_class,
+                                           unit_choices=unit_choices, max_digits=max_digits,
+                                           decimal_places=decimal_places, *args, **kwargs)
         else:
-            return MeasurementFloatField(verbose_name=verbose_name, name=name, measurement=measurement,
-                 measurement_class=measurement_class, unit_choices=unit_choices, *args, **kwargs)
+            return MeasurementFloatField(verbose_name=verbose_name, name=name,
+                                         measurement=measurement,
+                                         measurement_class=measurement_class,
+                                         unit_choices=unit_choices, *args, **kwargs)
