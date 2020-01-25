@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from measurement import measures
 from measurement.base import BidimensionalMeasure, MeasureBase
+
 from django_measurement import forms
 from django_measurement.utils import get_measurement
 
