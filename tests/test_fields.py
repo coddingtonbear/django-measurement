@@ -146,7 +146,7 @@ class TestDeconstruct:
         name, path, args, kwargs = field.deconstruct()
 
         assert name == fieldname
-        assert path == 'django_measurement.models.MeasurementField'
+        assert path == 'django_measurement.models.MeasurementFloatField'
         assert args == []
         assert kwargs['blank'] == field.blank
         assert kwargs['null'] == field.null
