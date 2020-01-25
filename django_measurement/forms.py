@@ -5,7 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 from measurement.base import BidimensionalMeasure, MeasureBase
 
-from django_measurement. import utils
+from django_measurement import utils
 from django_measurement.conf import settings
 
 
