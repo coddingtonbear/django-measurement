@@ -1,17 +1,12 @@
 from measurement.base import BidimensionalMeasure
 
 
-def get_measurement(measure, value, unit=None, original_unit=None, decimal=False):
+def get_measurement(measure, value, unit=None, original_unit=None):
     unit = unit or measure.STANDARD_UNIT
 
-    if not decimal:
-        m = measure(
-            **{unit: value}
-        )
-    else:
-        m = measure(
-            **{unit: value}, decimal=decimal
-        )
+    m = measure(
+        **{unit: value},
+    )
     if original_unit:
         m.unit = original_unit
     if isinstance(m, BidimensionalMeasure):
