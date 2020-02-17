@@ -1,11 +1,13 @@
-import pytest
+from decimal import Decimal
+
 from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
+
+import pytest
+from django_measurement.forms import MeasurementField
 from measurement import measures
 from measurement.measures import Distance
-
-from django_measurement.forms import MeasurementField
 from tests.custom_measure_base import DegreePerTime, Temperature, Time
 from tests.forms import (
     BiDimensionalLabelTestForm, LabelTestForm, MeasurementTestForm, SITestForm
@@ -18,11 +20,14 @@ pytestmark = [
 
 
 class TestMeasurementField:
+
     def test_storage_of_standard_measurement(self):
-        measurement = measures.Weight(g=20)
+        measurement = measures.Mass(g="20", decimal=True)
 
         instance = MeasurementTestModel()
         instance.measurement_weight = measurement
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
@@ -30,39 +35,36 @@ class TestMeasurementField:
         assert retrieved.measurement_weight == measurement
 
     def test_storage_of_temperature(self):
-        measurement = measures.Temperature(c=20)
+        measurement = measures.Temperature(c="20", decimal=True)
 
         instance = MeasurementTestModel()
         instance.measurement_temperature = measurement
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
         assert retrieved.measurement_temperature == measurement
 
-    def test_storage_of_string_value(self):
+    def test_storage_of_value(self):
         instance = MeasurementTestModel()
-        instance.measurement_weight = "21.4"
+        instance.measurement_weight = Decimal("21.4")
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
 
-        assert retrieved.measurement_weight == measures.Weight(g=21.4)
-
-    def test_storage_of_float_value(self):
-        instance = MeasurementTestModel()
-        instance.measurement_weight = 21.4
-        instance.save()
-
-        retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
-
-        assert retrieved.measurement_weight == measures.Weight(g=21.4)
+        assert retrieved.measurement_weight == measures.Mass(g="21.4", decimal=True)
 
     def test_storage_of_bidimensional_measurement(self):
-        measurement = measures.Speed(mph=20)
+        measurement = measures.Speed(mph="20", decimal=True)
 
         instance = MeasurementTestModel()
         instance.measurement_speed = measurement
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
@@ -70,10 +72,11 @@ class TestMeasurementField:
         assert retrieved.measurement_speed == measurement
 
     def test_storage_and_retrieval_of_bidimensional_measurement(self):
-        original_value = measures.Speed(mph=65)
+        original_value = measures.Speed(mph="65", decimal=True)
 
         MeasurementTestModel.objects.create(
             measurement_speed=original_value,
+            max_digits=20, decimal_places=10
         )
 
         retrieved = MeasurementTestModel.objects.get()
@@ -85,10 +88,11 @@ class TestMeasurementField:
         assert new_value.unit == original_value.STANDARD_UNIT
 
     def test_storage_and_retrieval_of_bidimensional_measurement_choice(self):
-        original_value = measures.Speed(mph=65)
+        original_value = measures.Speed(mph="65", decimal=True)
 
         MeasurementTestModel.objects.create(
             measurement_speed_mph=original_value,
+            max_digits=20, decimal_places=10
         )
 
         retrieved = MeasurementTestModel.objects.get()
@@ -100,10 +104,11 @@ class TestMeasurementField:
         assert new_value.unit == original_value.unit
 
     def test_storage_and_retrieval_of_measurement(self):
-        original_value = measures.Weight(lb=124)
+        original_value = measures.Mass(lb="124", decimal=True)
 
         MeasurementTestModel.objects.create(
             measurement_weight=original_value,
+            max_digits=20, decimal_places=10
         )
 
         retrieved = MeasurementTestModel.objects.get()
@@ -114,10 +119,11 @@ class TestMeasurementField:
         assert new_value.unit == original_value.STANDARD_UNIT
 
     def test_storage_and_retrieval_of_measurement_choice(self):
-        original_value = measures.Distance(km=100)
+        original_value = measures.Distance(km="100", decimal=True)
 
         MeasurementTestModel.objects.create(
             measurement_distance_km=original_value,
+            max_digits=20, decimal_places=10
         )
 
         retrieved = MeasurementTestModel.objects.get()
@@ -129,7 +135,7 @@ class TestMeasurementField:
 
 
 @pytest.mark.parametrize('fieldname, measure_cls', [
-    ('measurement_weight', measures.Weight),
+    ('measurement_weight', measures.Mass),
     ('measurement_distance', measures.Distance),
     ('measurement_distance_km', measures.Distance),
     ('measurement_speed', measures.Speed),
@@ -146,11 +152,13 @@ class TestDeconstruct:
         name, path, args, kwargs = field.deconstruct()
 
         assert name == fieldname
-        assert path == 'django_measurement.models.MeasurementField'
         assert args == []
         assert kwargs['blank'] == field.blank
         assert kwargs['null'] == field.null
         assert kwargs['measurement'] == field.measurement
+        assert kwargs['max_digits'] == 20
+        assert kwargs['decimal_places'] == 10
+        assert path == 'django_measurement.models.MeasurementDecimalField'
 
         new_cls = module_loading.import_string(path)
         new_field = new_cls(name=name, *args, **kwargs)
@@ -161,9 +169,10 @@ class TestDeconstruct:
         )
 
 
+# ToDo: Correct the expected_serialized_value for the decimal fields
 @pytest.mark.parametrize('fieldname, measure, expected_serialized_value', [
-    ('measurement_weight', measures.Weight(kg=4.0), "4.0:kg"),
-    ('measurement_speed', measures.Speed(mi__hr=2.0), "2.0:mi__hr"),
+    ('measurement_weight', measures.Mass(kg="4.0", decimal=True), "4.0:kg"),
+    ('measurement_speed', measures.Speed(mi__hr="2.0", decimal=True), "2.0:mi__hr"),
 ])
 class TestSerialization:
     def test_deconstruct(self, fieldname, measure, expected_serialized_value):
@@ -180,6 +189,8 @@ class TestSerialization:
 
         assert deserialized_value == measure
 
+# ToDo: Need equivalent decimal tests from here on down
+
 
 class TestMeasurementFormField:
     def test_max_value(self):
@@ -194,7 +205,8 @@ class TestMeasurementFormField:
         assert valid_form.is_valid()
         assert not invalid_form.is_valid()
 
-        field = MeasurementField(measures.Distance, max_value=measures.Distance(mi=1))
+        field = MeasurementField(measures.Distance, 
+            max_value=measures.Distance(mi="1", decimal=True))
         field.clean([0.5, 'mi'])
         with pytest.raises(ValidationError) as e:
             field.clean([2.0, 'mi'])
@@ -235,25 +247,26 @@ class TestMeasurementFormField:
             MeasurementField(measures.Distance, min_value=1.0)
             assert str(e) == '"min_value" must be a measure, got float'
 
-    def test_float_casting(self, caplog):
+    def test_decimal_casting(self, caplog):
         m = MeasurementTestModel(
-            measurement_distance=float(2000),
-            measurement_distance_km=2,
+            measurement_distance=Decimal("2000"),
+            measurement_distance_km=Decimal("2"),
+            max_digits=20, decimal_places=10
         )
         m.full_clean()
 
-        assert m.measurement_distance.value == 2000
+        assert m.measurement_distance.value == Decimal("2000")
         assert m.measurement_distance.unit == Distance.STANDARD_UNIT
 
-        assert m.measurement_distance_km.value == 2
-        assert m.measurement_distance_km.unit == 'km'
-        assert m.measurement_distance_km == Distance(km=2)
+        assert m.measurement_distance_km.value == Decimal("2")
+        assert m.measurement_distance_km.unit == "km"
+        assert m.measurement_distance_km == Distance(km="2", decimal=True)
 
-        m.measurement_distance_km = Distance(km=1)
+        m.measurement_distance_km = Distance(km="1", decimal=True)
         m.full_clean()
-        assert m.measurement_distance_km.value == 1
-        assert m.measurement_distance_km.unit == 'km'
-        assert m.measurement_distance_km == Distance(km=1)
+        assert m.measurement_distance_km.value == Decimal("1")
+        assert m.measurement_distance_km.unit == "km"
+        assert m.measurement_distance_km == Distance(km="1", decimal=True)
 
         record = caplog.records[0]
 

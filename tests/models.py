@@ -1,8 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from measurement import measures
 
 from django_measurement.models import MeasurementField
+from measurement import measures
 from tests.custom_measure_base import DegreePerTime, Temperature, Time
 
 
@@ -13,8 +13,10 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Distance(mi=1.0)),
             MaxValueValidator(measures.Distance(mi=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
+
     measurement_distance_km = MeasurementField(
         measurement=measures.Distance,
         unit_choices=(('km', 'km'),),
@@ -22,16 +24,18 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Distance(km=1.0)),
             MaxValueValidator(measures.Distance(km=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_weight = MeasurementField(
-        measurement=measures.Weight,
+        measurement=measures.Mass,
         validators=[
-            MinValueValidator(measures.Weight(kg=1.0)),
-            MaxValueValidator(measures.Weight(kg=3.0))
+            MinValueValidator(measures.Mass(kg=1.0)),
+            MaxValueValidator(measures.Mass(kg=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_speed = MeasurementField(
@@ -40,7 +44,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Speed(mph=1.0)),
             MaxValueValidator(measures.Speed(mph=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_temperature = MeasurementField(
@@ -49,7 +54,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Temperature(1.0)),
             MaxValueValidator(measures.Temperature(3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_temperature2 = MeasurementField(
@@ -58,7 +64,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Temperature(1.0)),
             MaxValueValidator(measures.Temperature(3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_speed_mph = MeasurementField(
@@ -68,22 +75,26 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Speed(mph=1.0)),
             MaxValueValidator(measures.Speed(mph=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_custom_degree_per_time = MeasurementField(
         measurement=DegreePerTime,
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_custom_temperature = MeasurementField(
         measurement=Temperature,
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_custom_time = MeasurementField(
         measurement=Time,
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     def __str__(self):

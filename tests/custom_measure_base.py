@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from measurement.base import BidimensionalMeasure, MeasureBase
 from sympy import S, Symbol
 
@@ -14,7 +16,7 @@ class Temperature(MeasureBase):
     UNITS = {
         'c': SU - S(273.15),
         'f': (SU - S(273.15)) * S('9/5') + 32,
-        'k': 1.0
+        'k': Decimal("1.0"),
     }
     LABELS = {
         'c': u'°C',
@@ -25,8 +27,8 @@ class Temperature(MeasureBase):
 
 class Time(MeasureBase):
     UNITS = {
-        's': 3600.0,
-        'h': 1.0,
+        's': Decimal("3600.0"),
+        'h': Decimal("1.0"),
     }
     SI_UNITS = ['s']
 

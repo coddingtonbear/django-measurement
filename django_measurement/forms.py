@@ -3,10 +3,9 @@ from itertools import product
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from django_measurement.conf import settings
+from django_measurement.utils import get_measurement
 from measurement.base import BidimensionalMeasure, MeasureBase
-
-from . import utils
-from .conf import settings
 
 
 class MeasurementWidget(forms.MultiWidget):
@@ -44,10 +43,19 @@ class MeasurementWidget(forms.MultiWidget):
         return [None, None]
 
 
+def get_number_field(max_digits, decimal_places, *args, **kwargs):
+    if max_digits is not None and decimal_places is not None:
+        return forms.DecimalField(max_digits=max_digits,
+                                  decimal_places=decimal_places,
+                                  *args, **kwargs)
+    else:
+        msg = 'Must specify both max_digits and decimal_places.'
+        raise ValueError(msg)
+
+
 class MeasurementField(forms.MultiValueField):
-    def __init__(self, measurement, max_value=None, min_value=None,
-                 unit_choices=None, validators=None, decimal=False,
-                 max_digits=None, decimal_places=None,
+    def __init__(self, measurement, max_value=None, min_value=None, unit_choices=None,
+                 validators=None, max_digits=None, decimal_places=None,
                  bidimensional_separator=settings.MEASUREMENT_BIDIMENSIONAL_SEPARATOR,
                  *args, **kwargs):
 
@@ -98,14 +106,7 @@ class MeasurementField(forms.MultiValueField):
                 raise ValueError(msg)
             validators += [MaxValueValidator(max_value)]
 
-        if decimal:
-            if max_digits is not None and decimal_places is not None:
-                number_field = forms.DecimalField(max_digits=max_digits, decimal_places=decimal_places, *args, **kwargs)
-            else:
-                msg = 'Must specify both max_digits and decimal_places when using decimals'
-                raise ValueError(msg)
-        else:
-            number_field = forms.FloatField(*args, **kwargs)
+        number_field = get_number_field(max_digits, decimal_places, *args, **kwargs)
 
         choice_field = forms.ChoiceField(choices=unit_choices)
         defaults = {
@@ -117,8 +118,7 @@ class MeasurementField(forms.MultiValueField):
         }
         defaults.update(kwargs)
         fields = (number_field, choice_field)
-        super().__init__(fields, validators=validators,
-                                               *args, **defaults)
+        super().__init__(fields, validators=validators, *args, **defaults)
 
     def compress(self, data_list):
         if not data_list:
@@ -128,7 +128,7 @@ class MeasurementField(forms.MultiValueField):
         if value in self.empty_values:
             return None
 
-        return utils.get_measurement(
+        return get_measurement(
             self.measurement_class,
             value,
             unit
