@@ -3,14 +3,14 @@ import logging
 import warnings
 
 from django.core import checks
-from django.db.models import Field, FloatField
+from django.db.models import Field
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from measurement import measures
-from measurement.base import BidimensionalMeasure, MeasureBase
 
 from django_measurement import forms
 from django_measurement.utils import get_measurement
+from measurement import measures
+from measurement.base import BidimensionalMeasure, MeasureBase
 
 logger = logging.getLogger('django_measurement')
 

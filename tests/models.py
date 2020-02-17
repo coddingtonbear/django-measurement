@@ -1,8 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from measurement import measures
 
 from django_measurement.models import MeasurementField
+from measurement import measures
 from tests.custom_measure_base import DegreePerTime, Temperature, Time
 
 

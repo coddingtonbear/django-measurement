@@ -2,10 +2,10 @@ from itertools import product
 
 from django import forms
 from django.core.validators import MaxValueValidator, MinValueValidator
-from measurement.base import BidimensionalMeasure, MeasureBase
 
 from django_measurement.conf import settings
 from django_measurement.utils import get_measurement
+from measurement.base import BidimensionalMeasure, MeasureBase
 
 
 class MeasurementWidget(forms.MultiWidget):

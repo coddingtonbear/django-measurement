@@ -1,11 +1,13 @@
-import pytest
+from decimal import Decimal
+
 from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
+
+import pytest
+from django_measurement.forms import MeasurementField
 from measurement import measures
 from measurement.measures import Distance
-
-from django_measurement.forms import MeasurementField
 from tests.custom_measure_base import DegreePerTime, Temperature, Time
 from tests.forms import (
     BiDimensionalLabelTestForm, LabelTestForm, MeasurementTestForm, SITestForm
@@ -24,8 +26,8 @@ class TestMeasurementField:
 
         instance = MeasurementTestModel()
         instance.measurement_weight = measurement
-        instance.max_digits=20
-        instance.decimal_places=10
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
@@ -37,8 +39,8 @@ class TestMeasurementField:
 
         instance = MeasurementTestModel()
         instance.measurement_temperature = measurement
-        instance.max_digits=20
-        instance.decimal_places=10
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
@@ -48,8 +50,8 @@ class TestMeasurementField:
     def test_storage_of_value(self):
         instance = MeasurementTestModel()
         instance.measurement_weight = Decimal("21.4")
-        instance.max_digits=20
-        instance.decimal_places=10
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
@@ -61,8 +63,8 @@ class TestMeasurementField:
 
         instance = MeasurementTestModel()
         instance.measurement_speed = measurement
-        instance.max_digits=20
-        instance.decimal_places=10
+        instance.max_digits = 20
+        instance.decimal_places = 10
         instance.save()
 
         retrieved = MeasurementTestModel.objects.get(pk=instance.pk)
@@ -157,7 +159,7 @@ class TestDeconstruct:
         assert kwargs['max_digits'] == 20
         assert kwargs['decimal_places'] == 10
         assert path == 'django_measurement.models.MeasurementDecimalField'
- 
+
         new_cls = module_loading.import_string(path)
         new_field = new_cls(name=name, *args, **kwargs)
 
@@ -165,6 +167,7 @@ class TestDeconstruct:
         assert field.deconstruct() == (
             name, path, args, kwargs
         )
+
 
 # ToDo: Correct the expected_serialized_value for the decimal fields
 @pytest.mark.parametrize('fieldname, measure, expected_serialized_value', [
@@ -188,6 +191,7 @@ class TestSerialization:
 
 # ToDo: Need equivalent decimal tests from here on down
 
+
 class TestMeasurementFormField:
     def test_max_value(self):
         valid_form = MeasurementTestForm({
@@ -201,7 +205,8 @@ class TestMeasurementFormField:
         assert valid_form.is_valid()
         assert not invalid_form.is_valid()
 
-        field = MeasurementField(measures.Distance, max_value=measures.Distance(mi="1", decimal=True))
+        field = MeasurementField(measures.Distance, 
+            max_value=measures.Distance(mi="1", decimal=True))
         field.clean([0.5, 'mi'])
         with pytest.raises(ValidationError) as e:
             field.clean([2.0, 'mi'])
