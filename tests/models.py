@@ -13,9 +13,10 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Distance(mi=1.0)),
             MaxValueValidator(measures.Distance(mi=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
-    
+
     measurement_distance_km = MeasurementField(
         measurement=measures.Distance,
         unit_choices=(('km', 'km'),),
@@ -23,7 +24,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Distance(km=1.0)),
             MaxValueValidator(measures.Distance(km=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_weight = MeasurementField(
@@ -32,7 +34,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Mass(kg=1.0)),
             MaxValueValidator(measures.Mass(kg=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_speed = MeasurementField(
@@ -41,7 +44,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Speed(mph=1.0)),
             MaxValueValidator(measures.Speed(mph=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_temperature = MeasurementField(
@@ -50,7 +54,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Temperature(1.0)),
             MaxValueValidator(measures.Temperature(3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_temperature2 = MeasurementField(
@@ -59,7 +64,8 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Temperature(1.0)),
             MaxValueValidator(measures.Temperature(3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_speed_mph = MeasurementField(
@@ -69,109 +75,23 @@ class MeasurementTestModel(models.Model):
             MinValueValidator(measures.Speed(mph=1.0)),
             MaxValueValidator(measures.Speed(mph=3.0))
         ],
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_custom_degree_per_time = MeasurementField(
         measurement=DegreePerTime,
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_custom_temperature = MeasurementField(
         measurement=Temperature,
-        blank=True, null=True,
+        blank=True, null=True, decimal=True, max_digits=20,
+        decimal_places=10
     )
 
     measurement_custom_time = MeasurementField(
-        measurement=Time,
-        blank=True, null=True,
-    )
-
-    measurement_distance_decimal = MeasurementField(
-        measurement=measures.Distance,
-        validators=[
-            MinValueValidator(measures.Distance(mi=1.0)),
-            MaxValueValidator(measures.Distance(mi=3.0))
-        ],
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_distance_km_decimal = MeasurementField(
-        measurement=measures.Distance,
-        unit_choices=(('km', 'km'),),
-        validators=[
-            MinValueValidator(measures.Distance(km=1.0)),
-            MaxValueValidator(measures.Distance(km=3.0))
-        ],
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_weight_decimal = MeasurementField(
-        measurement=measures.Mass,
-        validators=[
-            MinValueValidator(measures.Mass(kg=1.0)),
-            MaxValueValidator(measures.Mass(kg=3.0))
-        ],
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_speed_decimal = MeasurementField(
-        measurement=measures.Speed,
-        validators=[
-            MinValueValidator(measures.Speed(mph=1.0)),
-            MaxValueValidator(measures.Speed(mph=3.0))
-        ],
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_temperature_decimal = MeasurementField(
-        measurement=measures.Temperature,
-        validators=[
-            MinValueValidator(measures.Temperature(1.0)),
-            MaxValueValidator(measures.Temperature(3.0))
-        ],
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_temperature2_decimal = MeasurementField(
-        measurement_class='Temperature',
-        validators=[
-            MinValueValidator(measures.Temperature(1.0)),
-            MaxValueValidator(measures.Temperature(3.0))
-        ],
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_speed_mph_decimal = MeasurementField(
-        measurement=measures.Speed,
-        unit_choices=(('mi__hr', 'mph'),),
-        validators=[
-            MinValueValidator(measures.Speed(mph=1.0)),
-            MaxValueValidator(measures.Speed(mph=3.0))
-        ],
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_custom_degree_per_time_decimal = MeasurementField(
-        measurement=DegreePerTime,
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_custom_temperature_decimal = MeasurementField(
-        measurement=Temperature,
-        blank=True, null=True, decimal=True, max_digits=20,
-        decimal_places=10
-    )
-
-    measurement_custom_time_decimal = MeasurementField(
         measurement=Time,
         blank=True, null=True, decimal=True, max_digits=20,
         decimal_places=10
