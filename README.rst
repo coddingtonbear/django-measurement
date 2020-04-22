@@ -26,11 +26,11 @@ Example use with a model:
        name = models.CharField(max_length=255)
        volume = MeasurementField(measurement=Volume)
    
-       def __unicode__(self):
-           return u"%s of %s" % (self.name, self.volume)
+       def __str__(self):
+           return f"{self.name} of {self.volume}"
 
    entry = BeerConsumptionLogEntry()
-   entry.name = 'Bear Republic Racer 5'
+   entry.name = "Bear Republic Racer 5"
    entry.volume = Volume(us_pint=1)
    entry.save()
 
@@ -40,12 +40,12 @@ too:
 
 .. code-block:: python
 
-   >>> from measurement.measures import Weight
-   >>> weight_1 = Weight(lb=125)
-   >>> weight_2 = Weight(kg=40)
+   >>> from measurement.measures import Mass
+   >>> weight_1 = Mass(lb=125)
+   >>> weight_2 = Mass(kg=40)
    >>> added_together = weight_1 + weight_2
    >>> added_together
-   Weight(lb=213.184976807)
+   Mass(lb=213.18497680735112)
    >>> added_together.kg  # Maybe I actually need this value in kg?
    96.699
 

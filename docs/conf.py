@@ -1,1 +1,1 @@
-master_doc = 'index'
+master_doc = "index"
