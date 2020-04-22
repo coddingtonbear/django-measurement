@@ -1,8 +1,9 @@
 from django import forms
 
 from django_measurement.forms import MeasurementField
-from tests.custom_measure_base import DegreePerTime, Temperature, Time
-from tests.models import MeasurementTestModel
+from tests.testapp.models import MeasurementTestModel
+
+from measurement import measures
 
 
 class MeasurementTestForm(forms.ModelForm):
@@ -12,12 +13,12 @@ class MeasurementTestForm(forms.ModelForm):
 
 
 class LabelTestForm(forms.Form):
-    simple = MeasurementField(Temperature)
+    simple = MeasurementField(measures.Temperature)
 
 
 class SITestForm(forms.Form):
-    simple = MeasurementField(Time)
+    simple = MeasurementField(measures.Time)
 
 
 class BiDimensionalLabelTestForm(forms.Form):
-    simple = MeasurementField(DegreePerTime)
+    simple = MeasurementField(measures.Volume)
