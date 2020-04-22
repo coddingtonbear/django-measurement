@@ -1,0 +1,3 @@
+exclude .*
+prune tests
+prune docs
