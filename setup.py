@@ -1,7 +1,4 @@
 #!/usr/bin/env python
 from setuptools import setup
 
-setup(
-    setup_requires=['pbr'],
-    pbr=True,
-)
+setup(name='django-measurement', pbr=True)

@@ -1,8 +1,0 @@
--e .
-coverage
-flake8
-isort
-pydocstyle
-pep8-naming
-pytest
-pytest-django
