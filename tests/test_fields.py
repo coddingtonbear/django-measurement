@@ -2,18 +2,12 @@ import pytest
 from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.utils import module_loading
-from measurement import measures
-from measurement.measures import Distance
 
 from django_measurement.forms import MeasurementField
-from tests.custom_measure_base import DegreePerTime, Temperature, Time
-from tests.forms import (
-    BiDimensionalLabelTestForm,
-    LabelTestForm,
-    MeasurementTestForm,
-    SITestForm,
-)
-from tests.models import MeasurementTestModel
+from tests.testapp.forms import MeasurementTestForm
+from tests.testapp.models import MeasurementTestModel
+
+from measurement import measures
 
 pytestmark = [
     pytest.mark.django_db,
@@ -126,15 +120,15 @@ class TestMeasurementField:
 @pytest.mark.parametrize(
     "fieldname, measure_cls",
     [
-        ("measurement_weight", measures.Weight),
+        ("measurement_mass", measures.Mass),
         ("measurement_distance", measures.Distance),
         ("measurement_distance_km", measures.Distance),
         ("measurement_speed", measures.Speed),
         ("measurement_temperature", measures.Temperature),
         ("measurement_speed_mph", measures.Speed),
-        ("measurement_custom_degree_per_time", DegreePerTime),
-        ("measurement_custom_temperature", Temperature),
-        ("measurement_custom_time", Time),
+        ("measurement_custom_degree_per_time", measures.VolumetricFlowRate),
+        ("measurement_custom_temperature", measures.Temperature),
+        ("measurement_custom_time", measures.Time),
     ],
 )
 class TestDeconstruct:
@@ -148,7 +142,7 @@ class TestDeconstruct:
         assert args == []
         assert kwargs["blank"] == field.blank
         assert kwargs["null"] == field.null
-        assert kwargs["measurement"] == field.measurement
+        assert kwargs["measure"] == field.measure
 
         new_cls = module_loading.import_string(path)
         new_field = new_cls(name=name, *args, **kwargs)
@@ -160,7 +154,7 @@ class TestDeconstruct:
 @pytest.mark.parametrize(
     "fieldname, measure, expected_serialized_value",
     [
-        ("measurement_weight", measures.Weight(kg=4.0), "4.0:kg"),
+        ("measurement_mass", measures.Mass(kg=4.0), "4.0:kg"),
         ("measurement_speed", measures.Speed(mi__hr=2.0), "2.0:mi__hr"),
     ],
 )
@@ -203,7 +197,7 @@ class TestMeasurementFormField:
 
     def test_form_storage(self):
         form = MeasurementTestForm(
-            {"measurement_distance_0": 2.0, "measurement_distance_1": "mi"}
+            {"measurement_distance_0": 2, "measurement_distance_1": "mi"}
         )
         assert form.is_valid()
         obj = form.save()
@@ -220,54 +214,12 @@ class TestMeasurementFormField:
         assert obj.measurement_speed == measures.Speed(mi__hr=2)
 
     def test_min_value(self):
-        field = MeasurementField(measures.Distance, min_value=measures.Distance(mi=1.0))
-        field.clean([2.0, "mi"])
+        field = MeasurementField(measures.Distance, min_value=measures.Distance(mi=1))
+        field.clean(["2 mi"])
         with pytest.raises(ValidationError) as e:
-            field.clean([0.5, "mi"])
-            assert "Ensure this value is greater than or equal to 1.0 mi." in str(e)
+            field.clean(["0.5 mi"])
+        assert "Ensure this value is greater than or equal to 1.0 mi." in str(e.value)
 
         with pytest.raises(ValueError) as e:
-            MeasurementField(measures.Distance, min_value=1.0)
-            assert str(e) == '"min_value" must be a measure, got float'
-
-    def test_float_casting(self, caplog):
-        m = MeasurementTestModel(
-            measurement_distance=float(2000), measurement_distance_km=2,
-        )
-        m.full_clean()
-
-        assert m.measurement_distance.value == 2000
-        assert m.measurement_distance.unit == Distance.STANDARD_UNIT
-
-        assert m.measurement_distance_km.value == 2
-        assert m.measurement_distance_km.unit == "km"
-        assert m.measurement_distance_km == Distance(km=2)
-
-        m.measurement_distance_km = Distance(km=1)
-        m.full_clean()
-        assert m.measurement_distance_km.value == 1
-        assert m.measurement_distance_km.unit == "km"
-        assert m.measurement_distance_km == Distance(km=1)
-
-        record = caplog.records[0]
-
-        assert record.levelname == "WARNING"
-        assert record.message == (
-            "You assigned a float instead of Distance to"
-            " tests.models.MeasurementTestModel.measurement_distance,"
-            ' unit was guessed to be "m".'
-        )
-
-    def test_unicode_labels(self):
-        form = LabelTestForm()
-        assert ("c", u"°C") in form.fields["simple"].fields[1].choices
-        assert ("f", u"°F") in form.fields["simple"].fields[1].choices
-        assert ("k", u"°K") in form.fields["simple"].fields[1].choices
-
-        si_form = SITestForm()
-        assert ("ms", "ms") in si_form.fields["simple"].fields[1].choices
-        assert ("Ps", "Ps") in si_form.fields["simple"].fields[1].choices
-
-        bi_dim_form = BiDimensionalLabelTestForm()
-        assert ("c__ms", u"°C/ms") in bi_dim_form.fields["simple"].fields[1].choices
-        assert ("c__Ps", u"°C/Ps") in bi_dim_form.fields["simple"].fields[1].choices
+            MeasurementField(measures.Distance, min_value=1)
+        assert str(e.value) == '"min_value" must be a measure, got float'

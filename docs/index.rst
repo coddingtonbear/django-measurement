@@ -36,7 +36,7 @@ Example use with a model:
 
    class BeerConsumptionLogEntry(models.Model):
        name = models.CharField(max_length=255)
-       volume = MeasurementField(measurement=Volume)
+       volume = MeasurementField(measure=Volume)
 
        def __unicode__(self):
            return u"%s of %s" % (self.name, self.volume)
@@ -52,12 +52,12 @@ too:
 
 .. code-block:: python
 
-   >>> from measurement.measures import Weight
-   >>> weight_1 = Weight(lb=125)
-   >>> weight_2 = Weight(kg=40)
+   >>> from measurement.measures import Mass
+   >>> weight_1 = Mass(lb=125)
+   >>> weight_2 = Mass(kg=40)
    >>> added_together = weight_1 + weight_2
    >>> added_together
-   Weight(lb=213.184976807)
+   Mass(lb=213.184976807)
    >>> added_together.kg  # Maybe I actually need this value in kg?
    96.699
 

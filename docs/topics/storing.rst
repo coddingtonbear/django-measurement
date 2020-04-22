@@ -12,7 +12,7 @@ you might (naively) create a model like such::
 
     class BeerConsumptionLogEntry(models.Model):
         name = models.CharField(max_length=255)
-        volume = MeasurementField(measurement=Volume)
+        volume = MeasurementField(measure=Volume)
 
         def __str__(self):
             return '%s of %s' % (self.name, self.volume)

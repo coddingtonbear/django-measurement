@@ -24,7 +24,7 @@ Example use with a model:
    
    class BeerConsumptionLogEntry(models.Model):
        name = models.CharField(max_length=255)
-       volume = MeasurementField(measurement=Volume)
+       volume = MeasurementField(measure=Volume)
    
        def __str__(self):
            return f"{self.name} of {self.volume}"
@@ -45,9 +45,9 @@ too:
    >>> weight_2 = Mass(kg=40)
    >>> added_together = weight_1 + weight_2
    >>> added_together
-   Mass(lb=213.18497680735112)
+   Mass(pound="213.1849048739510322891895205")
    >>> added_together.kg  # Maybe I actually need this value in kg?
-   96.699
+   Decimal('96.69904624999999999999999998')
 
 - Documentation for django-measurement is available via `Read the Docs`_.
 - Please post issues on GitHub_.
