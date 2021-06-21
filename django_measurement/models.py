@@ -137,7 +137,11 @@ class MeasurementField(FloatField):
             )
         )
         logger.warning(msg)
-        return get_measurement(measure=self.measurement, value=value, unit=return_unit,)
+        return get_measurement(
+            measure=self.measurement,
+            value=value,
+            unit=return_unit,
+        )
 
     def formfield(self, **kwargs):
         defaults = {"form_class": forms.MeasurementField}

@@ -79,14 +79,22 @@ class MeasurementTestModel(models.Model):
     )
 
     measurement_custom_degree_per_time = MeasurementField(
-        measurement=DegreePerTime, blank=True, null=True,
+        measurement=DegreePerTime,
+        blank=True,
+        null=True,
     )
 
     measurement_custom_temperature = MeasurementField(
-        measurement=Temperature, blank=True, null=True,
+        measurement=Temperature,
+        blank=True,
+        null=True,
     )
 
-    measurement_custom_time = MeasurementField(measurement=Time, blank=True, null=True,)
+    measurement_custom_time = MeasurementField(
+        measurement=Time,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return self.measurement

@@ -63,10 +63,11 @@ class MeasurementField(forms.MultiValueField):
         self.measurement_class = measurement
         if not unit_choices:
             if issubclass(measurement, BidimensionalMeasure):
-                assert isinstance(bidimensional_separator, str), (
-                    "Supplied bidimensional_separator for %s must be of string/unicode type;"
-                    " Instead got type %s"
-                    % (measurement, str(type(bidimensional_separator)),)
+                assert isinstance(
+                    bidimensional_separator, str
+                ), "Supplied bidimensional_separator for %s must be of string/unicode type;" " Instead got type %s" % (
+                    measurement,
+                    str(type(bidimensional_separator)),
                 )
                 unit_choices = tuple(
                     (

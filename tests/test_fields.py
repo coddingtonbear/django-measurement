@@ -75,7 +75,9 @@ class TestMeasurementField:
     def test_storage_and_retrieval_of_bidimensional_measurement(self):
         original_value = measures.Speed(mph=65)
 
-        MeasurementTestModel.objects.create(measurement_speed=original_value,)
+        MeasurementTestModel.objects.create(
+            measurement_speed=original_value,
+        )
 
         retrieved = MeasurementTestModel.objects.get()
 
@@ -88,7 +90,9 @@ class TestMeasurementField:
     def test_storage_and_retrieval_of_bidimensional_measurement_choice(self):
         original_value = measures.Speed(mph=65)
 
-        MeasurementTestModel.objects.create(measurement_speed_mph=original_value,)
+        MeasurementTestModel.objects.create(
+            measurement_speed_mph=original_value,
+        )
 
         retrieved = MeasurementTestModel.objects.get()
 
@@ -101,7 +105,9 @@ class TestMeasurementField:
     def test_storage_and_retrieval_of_measurement(self):
         original_value = measures.Weight(lb=124)
 
-        MeasurementTestModel.objects.create(measurement_weight=original_value,)
+        MeasurementTestModel.objects.create(
+            measurement_weight=original_value,
+        )
 
         retrieved = MeasurementTestModel.objects.get()
         new_value = retrieved.measurement_weight
@@ -113,7 +119,9 @@ class TestMeasurementField:
     def test_storage_and_retrieval_of_measurement_choice(self):
         original_value = measures.Distance(km=100)
 
-        MeasurementTestModel.objects.create(measurement_distance_km=original_value,)
+        MeasurementTestModel.objects.create(
+            measurement_distance_km=original_value,
+        )
 
         retrieved = MeasurementTestModel.objects.get()
         new_value = retrieved.measurement_distance_km
@@ -232,7 +240,8 @@ class TestMeasurementFormField:
 
     def test_float_casting(self, caplog):
         m = MeasurementTestModel(
-            measurement_distance=float(2000), measurement_distance_km=2,
+            measurement_distance=float(2000),
+            measurement_distance_km=2,
         )
         m.full_clean()
 
