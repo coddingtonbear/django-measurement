@@ -32,14 +32,17 @@ class MeasurementWidget(forms.MultiWidget):
 
     def decompress(self, value):
         if value:
-            choice_units = set([u for u, n in self.unit_choices])
+            if isinstance(value, str):
+                magnitude, unit = [v.strip() for v in value.split(' ')]
+                return [float(magnitude), unit]
+            elif isinstance(value, MeasureBase):
+                choice_units = set([u for u, n in self.unit_choices])
+                unit = value.STANDARD_UNIT
+                if unit not in choice_units:
+                    unit = choice_units.pop()
 
-            unit = value.STANDARD_UNIT
-            if unit not in choice_units:
-                unit = choice_units.pop()
-
-            magnitude = getattr(value, unit)
-            return [magnitude, unit]
+                magnitude = getattr(value, unit)
+                return [magnitude, unit]
 
         return [None, None]
 
