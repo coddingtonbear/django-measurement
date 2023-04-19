@@ -1,3 +1,4 @@
+import ast
 from itertools import product
 
 from django import forms
@@ -33,7 +34,14 @@ class MeasurementWidget(forms.MultiWidget):
     def decompress(self, value):
         if value:
             if isinstance(value, str):
-                magnitude, unit = [v.strip() for v in value.split(' ')]
+                try:
+                    literal_value = ast.literal_eval(value)
+                    magnitude, unit = literal_value
+                except:
+                    literal_value = value
+                    magnitude, unit = [
+                        v.strip() for v in literal_value.split(' ')
+                    ]
                 return [float(magnitude), unit]
             elif isinstance(value, MeasureBase):
                 choice_units = set([u for u, n in self.unit_choices])
