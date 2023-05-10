@@ -32,6 +32,10 @@ class MeasurementWidget(forms.MultiWidget):
 
     def decompress(self, value):
         if value:
+            if isinstance(value, str):
+                instance = {str(value).split()[1]:str(value).split()[0]}
+                value = Weight(**instance)
+            
             choice_units = set([u for u, n in self.unit_choices])
 
             unit = value.STANDARD_UNIT
